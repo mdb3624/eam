@@ -36,8 +36,9 @@ Roles hand off forward only — no circular rework loops.
 2. **Phase Lock:** once accepted, inputs are frozen — CODER can't ask BA to change AC mid-implementation, ARCH can't request BA clarification after design starts.
 3. **Forward-Only Escalation:** a role that hits an impossible/wrong input escalates to LIBRARIAN, never backward to the role that produced it.
 4. **Change Requests:** LIBRARIAN decides — finish as-is with a CHG-### tracked separately, or pause and spin up a reworked `US-###-v2`.
+5. **Fast-Track exception (narrow):** for cosmetic-only gaps — UI copy wording, a display label, formatting/rounding of a display value — a role may consult the authoring role directly instead of filing a CHG-###, provided the resolution is (a) documented inline in the PR/story doc, and (b) logged by LIBRARIAN as a `[FAST-TRACK]` traceability entry. This never applies to AC pass/fail criteria, schema/contract shape, or business/compliance/money logic — anything touching those is Phase Lock as usual: escalate to LIBRARIAN, not the authoring role.
 
-Full protocol: `.claude/rules/change-request-protocol.md` and `docs/roles/LIBRARIAN.md`.
+Full protocol: `.claude/rules/change-request-protocol.md` and `docs/roles/LIBRARIAN.md`. Fast-Track scope and traceability requirement are defined identically across `docs/roles/BUSINESS_ANALYST.md`, `ARCHITECT.md`, `CODER.md`, `LIBRARIAN.md` — do not widen it in one role doc without updating all of them plus this section.
 
 **Branch verification is part of this lock:** before any role starts work, confirm `git branch -v` shows a `feature/US-XXX-...` branch, not `main`. If on `main`, `git checkout -b feature/US-XXX-short-description` first.
 

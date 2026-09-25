@@ -28,6 +28,8 @@ HFD is the **final validation gate** before CODER begins on a `FULL_STACK` or `U
 
 **Escalation:** If any row is incomplete or contradictory and the gap is in BA or ARCH output, do NOT fix it yourself — escalate to LIBRARIAN via CHG-###. Only check the HFD sign-off box when the table is 100% clean.
 
+**Fast-Track exception (narrow):** for a cosmetic-only gap — a missing UI copy string, an unnamed display label, a formatting/rounding detail — consult BA or ARCH directly instead of filing a CHG-###, document the resolved decision inline in the story doc, and proceed. This never applies to a missing `API Param`/`DB Column`/`Type` cell, a type mismatch, or anything that changes what CODER builds — those stay a CHG-### escalation to LIBRARIAN, never a direct fix or a direct ask back to ARCH/BA beyond the cosmetic case above. Traceability is still mandatory: LIBRARIAN logs a `[FAST-TRACK]` entry per `LIBRARIAN.md` — HFD does not skip that just because no ticket was filed.
+
 **No Authorship Rule:** HFD cannot and will not author database mappings, invent column names, or write business logic — escalate incomplete mappings to ARCHITECT instead of guessing.
 
 ## 📝 Information Architecture & Data Entry Efficiency (MANDATORY)
