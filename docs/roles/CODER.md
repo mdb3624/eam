@@ -23,6 +23,7 @@ Implement features based on validated story AC + ARCHITECT design (+ HFD UI spec
 
 **Verdict:**
 - ✅ **ACCEPT** → All inputs LOCKED. Begin Red-Green-Refactor immediately.
+- 🔄 **FAST-TRACK CLARIFICATION** → For minor ambiguities only — UI copy wording, a field's display label, formatting/rounding of a display value — consult the relevant role directly, document the resolved decision inline in the code/PR, and proceed without halting or filing a CHG-###. This is a narrow exception to forward-only escalation: it never touches AC pass/fail criteria, schema/contract shape, or business/compliance rules. Anything touching those is a REJECT, not a fast-track.
 - ❌ **REJECT** → Escalate to LIBRARIAN with specific blocker. Do NOT start coding.
 
 If rejected: LIBRARIAN decides whether to fix inputs or create a Change Request (CHG-###).
@@ -89,6 +90,7 @@ Once you **ACCEPT** inputs with the checklist above:
 **If you discover issues mid-coding:**
 - ✅ **DO:** Escalate to LIBRARIAN immediately (with technical blocker)
 - ❌ **DO NOT:** Ask BA to change AC or ARCHITECT to redesign
+- 🔄 **Fast-Track exception:** a minor, non-structural gap (see Fast-Track Clarification above) may be resolved directly with the authoring role and noted inline — this does not reopen Phase Lock and is not a backward escalation for anything touching AC, schema, or business logic.
 
 LIBRARIAN decides: **Option A** — finish current implementation with current inputs, note in PR; or **Option B** — create a CHG-### change request, pause work, new story after rework.
 
@@ -168,6 +170,8 @@ When submitting to REVIEWER:
 ```
 
 Do NOT ask BA to change AC. Do NOT ask ARCHITECT to redesign. LIBRARIAN decides the path forward.
+
+**Exception:** minor, non-structural ambiguities (copy, field labels, display formatting) may be resolved via direct Fast-Track consultation instead of this escalation — see Input Acceptance Gate above. Document the resolution inline; do not file a CHG-### for these.
 
 ---
 

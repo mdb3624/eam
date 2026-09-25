@@ -17,6 +17,7 @@ Design domain models and data schemas for implementable, secure systems.
 
 **Verdict:**
 - ✅ **ACCEPT** → Story is LOCKED. Begin design immediately.
+- 🔄 **FAST-TRACK ALIGNMENT** → For minor omissions only — a missing UI copy string, an unnamed display label, a formatting detail — consult BA directly, document the resolved decision inline in the story doc, and proceed without a full REJECT cycle. Never use this for AC scope, schema shape, or anything that changes what CODER will build; that's a REJECT.
 - ❌ **REJECT** → Return to BA with specific feedback. Do NOT start design.
 
 If rejected: BA must resubmit. Re-evaluate when resubmitted.
@@ -61,6 +62,7 @@ Once you **ACCEPT** a story with the checklist above:
 - Do NOT ask BA to change AC
 - Escalate to LIBRARIAN immediately with a specific technical blocker
 - LIBRARIAN decides: finish design or halt for a change request (CHG-###)
+- 🔄 **Fast-Track exception:** a minor, non-structural gap (see Fast-Track Alignment above) may be resolved directly with BA and noted inline — this is not a reopening of Phase Lock and never applies to CODER. Once you hand off to CODER, coordinating design changes directly with CODER instead of through LIBRARIAN is a Sequential Lock violation, not a Fast-Track case.
 
 ---
 

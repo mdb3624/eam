@@ -61,6 +61,16 @@ When marking a story "DONE", append a `## Librarian Sign-Off` section directly t
 6. **LIBRARIAN_VERIFICATION** → Librarian verifies traceability (Librarian)
 7. **DONE** → Librarian signs off; story marked complete (Librarian)
 
+## Fast-Track Change Management (Lightweight, Non-Structural Only)
+
+Mirrors CODER.md's Fast-Track Clarification exception — scope is identical and just as narrow: UI copy wording, a field's display label, formatting/rounding of a display value. Anything touching AC pass/fail criteria, schema/contract shape, or business/compliance rules is NOT eligible here and must go through the full CHG-### protocol below.
+
+- **No CHG-### ticket required.** The role documents the resolved decision inline in the PR description or story file instead of filing a ticket.
+- **Traceability is still mandatory.** LIBRARIAN adds one line to the Technical Debt Ledger or the story's own file (whichever the story uses) tagged `[FAST-TRACK]` noting what was resolved and by whom — this is the only record, so skipping it makes the decision unverifiable later.
+- **If a role invokes Fast-Track for something structural** (schema, AC, compliance, money/rate logic), LIBRARIAN rejects the fast-track and requires the full CHG-### protocol instead — this is a code-review/traceability failure if it slips through.
+
+---
+
 ## Change Request (CHG-###) Full Protocol
 
 The short trigger/4-step summary lives in `.claude/rules/change-request-protocol.md` (always loaded). This section is the full template and decision options.
