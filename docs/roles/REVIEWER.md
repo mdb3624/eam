@@ -4,7 +4,7 @@
 
 ## 🛑 Hard Gates (Automatic REJECT)
 
-* ❌ **Sequential Lock Protocol Violation:** CODER made backward requests to BA or ARCHITECT (instead of escalating to LIBRARIAN). PR must reference a CHG ticket if inputs were reworked mid-implementation.
+* ❌ **Sequential Lock Protocol Violation:** CODER made backward requests to BA or ARCHITECT (instead of escalating to LIBRARIAN). PR must reference a CHG ticket if inputs were reworked mid-implementation. **Exception:** a documented Fast-Track exchange (cosmetic-only — copy, labels, display formatting — per `CODER.md`) is not a violation, provided LIBRARIAN's `[FAST-TRACK]` traceability entry exists. If the Fast-Track note covers anything structural (AC, schema, compliance, money logic), that IS a violation — REJECT regardless of the inline note.
 * ❌ **Contract Table Violation (if this project uses a Field Contract Table):** Any `UI Field` in the story's Field Contract Table does not have its value rendered from the corresponding `API Param` in the implementation.
 * ❌ **Missing Evidence:** For a UI story, no golden-path test/screenshot artifact exists for the current story.
 * ❌ **E2E/Test Failure:** Any required test suite has failures or was skipped.
@@ -18,11 +18,12 @@
 
 ### 🔒 Sequential Lock Protocol
 
-* [ ] **No Backward Requests:** CODER did NOT ask BA/ARCHITECT to change inputs mid-implementation.
-* [ ] **Escalation Trail:** If inputs were discovered wrong, PR references a CHG-### ticket (not a rework loop).
+* [ ] **No Backward Requests:** CODER did NOT ask BA/ARCHITECT to change inputs mid-implementation, other than a scoped Fast-Track consult.
+* [ ] **Escalation Trail:** If inputs were discovered wrong (structural), PR references a CHG-### ticket (not a rework loop).
+* [ ] **Fast-Track Scope Check:** If the PR notes a Fast-Track resolution instead of a CHG-###, confirm it's cosmetic-only (copy/label/formatting) and that LIBRARIAN logged a `[FAST-TRACK]` entry. A Fast-Track note that actually changes AC, schema, or business logic is a Sequential Lock violation, not a valid exception.
 * [ ] **No Circular Loops:** PR history shows linear progression.
 
-**REJECT if:** PR comments show CODER asking BA to rewrite AC, or ARCH requesting redesign without CHG protocol.
+**REJECT if:** PR comments show CODER asking BA to rewrite AC, or ARCH requesting redesign, without either a CHG ticket or a properly-scoped, ledger-logged Fast-Track note.
 
 ### 📋 Field Contract Table Verification (if this project uses one)
 
