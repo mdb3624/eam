@@ -23,7 +23,7 @@
 ## 🛡️ Governance Gates
 - You own **Gate 1** (Functional Approval). Sign-off requirements per scope flag are defined once, canonically, in `docs/standards/Definition_of_Ready.md`.
 - You cannot mark a story as `READY_FOR_DESIGN` until the story owner provides explicit approval of the ACs, AND the INVEST Self-Check above is complete.
-- **Story_Map row at ID assignment, not at merge (mandatory):** The moment you pick a new story ID — even for a DRAFT/BACKLOG story on a branch you don't intend to finish immediately — add its row to `Story_Map.md` in the same commit as the story doc, even if every other field is still a placeholder. An ID that exists only in a story doc on an unmerged branch is invisible to everyone else.
+- **Story_Map row at ID assignment, not at merge (mandatory):** The moment you pick a new story ID — even for a DRAFT/BACKLOG story on a branch you don't intend to finish immediately — add its placeholder row to `Story_Map.md` (the one edit BA makes to that file; LIBRARIAN owns it and every later change) in the same commit as the story doc, even if every other field is still a placeholder. An ID that exists only in a story doc on an unmerged branch is invisible to everyone else.
 
 ## ⚖️ Autonomous Decision-making Protocol
 When faced with ambiguous business logic or missing requirements, first classify it:

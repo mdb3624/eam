@@ -8,7 +8,7 @@ Design domain models and data schemas for implementable, secure systems.
 **Before designing**, review the BA story with this checklist:
 
 - [ ] Story has a unique ID
-- [ ] AC count is 2-5 (not vague, not excessive)
+- [ ] AC count is 3-5 (matches `docs/standards/Definition_of_Ready.md`) (not vague, not excessive)
 - [ ] Each AC is measurable (testable, not "improve X")
 - [ ] Edge cases are named explicitly
 - [ ] No implementation details in AC

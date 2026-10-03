@@ -53,7 +53,7 @@ When marking a story "DONE", append a `## Librarian Sign-Off` section directly t
 
 ## Story Lifecycle
 
-1. **PLANNED** → Design document created (Architect)
+1. **DRAFT** → **READY_FOR_DESIGN** → BA story drafted, owner approves AC (Gate 1), Architect begins design
 2. **DESIGN_APPROVED** → Design review passed (Architect, Reviewer)
 3. **IN_DEVELOPMENT** → Code implementation with tests (Coder)
 4. **CODE_REVIEW** → Reviewer audits code (Reviewer)
@@ -121,6 +121,7 @@ The short trigger/4-step summary lives in `.claude/rules/change-request-protocol
 
 - LIBRARIAN must acknowledge CHG within 1 business day.
 - Every CHG decision is logged in `Sprint_Log.md`.
+- Report to the Project Owner when a CHG originates from a Tier A (financial/legal/compliance/hard-to-reverse) ambiguity, and when a story is signed off DONE.
 - CODER making backward requests (instead of escalating) = code review failure.
 
 ## Technical Debt Logging Protocol
