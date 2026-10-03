@@ -7,7 +7,7 @@ Java 21, Spring Boot 3.5, Maven wrapper, PostgreSQL 16 (PostGIS image, extension
 
 ## Multi-tenancy
 - Tenant identity lives in `TenantContextHolder` (ThreadLocal) and must be cleared in a `finally` block.
-- `TenantAwareDataSource` wraps the Hikari pool and issues `SET LOCAL app.current_tenant = '<uuid>'` as its own statement on every connection, and again after every `commit()`/`rollback()`.
+- `TenantAwareDataSource` wraps the Hikari pool and issues `SET LOCAL app.current_tenant = '<uuid>'` as its own statement on every connection when a tenant is bound, and again after every `commit()`/`rollback()`.
 - Postgres RLS policies on every tenant-owned table filter on that setting; unset means zero rows (fail closed).
 - `spring.jpa.open-in-view=false`: with OSIV on, one connection serves several transactions per request and SET LOCAL is lost after the first.
 - All writes made while a tenant is bound must run inside a `@Transactional` boundary. `TenantAwareDataSource` turns autocommit off when a tenant is bound, so a bare `JdbcTemplate` write outside a transaction is rolled back when the connection is returned to the pool.

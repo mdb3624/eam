@@ -6,7 +6,7 @@
 - `VARCHAR` or `TEXT` for strings. Never `CHAR(n)`.
 
 ## Multi-Tenancy & Isolation
-- Every tenant-owned table has a `tenant_id UUID NOT NULL` column, RLS enabled, and a policy keyed on `NULLIF(current_setting('app.current_tenant', true), '')::uuid` (fail closed: unset means zero rows).
+- Every tenant-owned table has a `tenant_id UUID NOT NULL` column (the root `tenants` table keys on its own `id`), RLS enabled, and a policy keyed on `NULLIF(current_setting('app.current_tenant', true), '')::uuid` (fail closed: unset means zero rows).
 - The GUC is exactly `app.current_tenant`. It is set by `TenantAwareDataSource` from `TenantContextHolder`. Do not invent other names.
 - The app connects as `eam_runtime` (non-superuser, NOBYPASSRLS). Never run app traffic or RLS tests as the Flyway admin: superusers bypass RLS.
 - Every query includes the tenant filter in application code as well (defense in depth), derived from `TenantContextHolder`.

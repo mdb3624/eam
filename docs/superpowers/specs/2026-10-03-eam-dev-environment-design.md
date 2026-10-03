@@ -71,7 +71,7 @@ The global CLAUDE.md rules cite FreightClub's 9090/9091/5173. eam's CLAUDE.md mu
 ## 4. Frontend, CI, role docs
 
 - Frontend: React 18, TypeScript, Vite, Vitest. `/api` proxy to the eam backend dev port. `allowedHosts` includes the current Tailscale domain.
-- CI (`ci.yml`): backend job on a Postgres service container using the three-role setup (mirrors `docker-compose.test.yml`); frontend build job. Skip on docs-only changes.
+- CI (`ci.yml`): backend job runs `./mvnw -B verify` with Testcontainers (bootstrap superuser as Flyway admin, `eam_runtime` for app traffic), no service container; frontend build job. Skip on docs-only changes.
 - Role-doc ports:
   - REVIEWER: Database Migrations, Entity-Migration Parity, Schema Type Consistency checks.
   - LIBRARIAN: Flyway filename convention check.
