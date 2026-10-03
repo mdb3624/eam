@@ -1,10 +1,10 @@
 package com.eam.db;
 
 import com.eam.support.AbstractPostgresIT;
+import com.eam.support.TenantSeed;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -16,24 +16,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class MigrationIT extends AbstractPostgresIT {
-
-    static void seedTenantWithUser(UUID tenantId, String email) throws SQLException {
-        try (Connection admin = adminConnection()) {
-            try (PreparedStatement tenant = admin.prepareStatement(
-                    "INSERT INTO eam.tenants (id, name) VALUES (?, ?)")) {
-                tenant.setObject(1, tenantId);
-                tenant.setString(2, "Tenant " + tenantId);
-                tenant.executeUpdate();
-            }
-            try (PreparedStatement user = admin.prepareStatement(
-                    "INSERT INTO eam.users (id, tenant_id, email) VALUES (?, ?, ?)")) {
-                user.setObject(1, UUID.randomUUID());
-                user.setObject(2, tenantId);
-                user.setString(3, email);
-                user.executeUpdate();
-            }
-        }
-    }
 
     private static boolean queryBoolean(String sql) throws SQLException {
         try (Connection admin = adminConnection();
@@ -70,7 +52,7 @@ class MigrationIT extends AbstractPostgresIT {
     @Test
     void runtimeRoleCannotHardDelete() throws Exception {
         UUID tenantId = UUID.randomUUID();
-        seedTenantWithUser(tenantId, "delete-" + tenantId + "@example.com");
+        TenantSeed.seedTenantWithUser(tenantId, "delete-" + tenantId + "@example.com");
         try (Connection runtime = runtimeConnection(tenantId);
              Statement statement = runtime.createStatement()) {
             assertThatThrownBy(() -> statement.executeUpdate("DELETE FROM eam.users"))
@@ -85,8 +67,8 @@ class MigrationIT extends AbstractPostgresIT {
         UUID tenantB = UUID.randomUUID();
         String emailA = "a-" + tenantA + "@example.com";
         String emailB = "b-" + tenantB + "@example.com";
-        seedTenantWithUser(tenantA, emailA);
-        seedTenantWithUser(tenantB, emailB);
+        TenantSeed.seedTenantWithUser(tenantA, emailA);
+        TenantSeed.seedTenantWithUser(tenantB, emailB);
 
         try (Connection login = loginLookupConnection();
              Statement statement = login.createStatement();
