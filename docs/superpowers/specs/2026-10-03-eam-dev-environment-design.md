@@ -54,9 +54,11 @@ The global CLAUDE.md rules cite FreightClub's 9090/9091/5173. eam's CLAUDE.md mu
 - Java 21, Spring Boot 3.5.x, Maven wrapper (`./mvnw`).
 - Dependencies: web, data-jpa, security, validation, actuator, flyway-core, flyway-database-postgresql, postgresql, jjwt (api/impl/jackson), mapstruct, Testcontainers, spring-boot-starter-test, spring-security-test.
 - Build gates: JaCoCo (floor 65%, ratchet toward 80% branch, per eam CLAUDE.md), Checkstyle, PMD.
-- Multi-tenancy plumbing: `TenantContextHolder` and a `TenantAwareDataSource` that sets `app.current_tenant_id` on each connection.
+- Multi-tenancy plumbing: `TenantContextHolder` and a `TenantAwareDataSource` that sets `app.current_tenant` on each connection (the GUC name FreightClub's code and policies actually use; its docs say `app.tenant_id` / `app.current_tenant_id`, which is wrong).
 - Migrations: `V0` creates the schema and three DB roles: Flyway admin, non-superuser runtime role (so RLS applies), narrow login-lookup role. Baseline tables `tenants` and `users` with RLS and `deleted_at`.
 - Naming: `VYYYYMMDD_HHmm__Desc.sql`.
+- Tests use Testcontainers (postgis image, bootstrap superuser as Flyway admin) so `./mvnw verify` is self-contained; `docker-compose.test.yml` exists for the running-stack check (DoD 5), not for the unit/integration suite.
+- `spring.jpa.open-in-view=false` (FreightClub's OSIV bug, see US-874/875 note in its TenantAwareDataSource).
 - `ddl-auto=validate` everywhere. Flyway owns all DDL.
 - `/actuator/health` exposed.
 
@@ -74,6 +76,7 @@ The global CLAUDE.md rules cite FreightClub's 9090/9091/5173. eam's CLAUDE.md mu
   - REVIEWER: Database Migrations, Entity-Migration Parity, Schema Type Consistency checks.
   - LIBRARIAN: Flyway filename convention check.
   - ARCHITECT: schema/migration tooling note (Flyway, naming, `database-migrations.md`).
+- eam `CLAUDE.md` line 71 and REVIEWER.md section 3 currently say "this project is not multi-tenant"; both must be replaced.
 - `database-migrations.md`: trimmed port of FreightClub's guide, Postgres-specific (FreightClub's copy mentions MySQL in places; do not carry that over).
 
 ## 5. Definition of done
