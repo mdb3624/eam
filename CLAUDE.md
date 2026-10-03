@@ -22,7 +22,7 @@ Once CODER.md's gate is satisfied, assume the specific persona requested and loa
 - **ARCHITECT.md** (Domain & Schema Design)
 - **CODER.md** (Feature Implementation) — Red-Green-Refactor, test class first
 - **REVIEWER.md** (Quality & Security Audit)
-- **LIBRARIAN.md** (Consistency & Traceability) — only role authorized to update `Sprint_Log.md`/`Story_Map.md` (created by LIBRARIAN on first story, not part of the initial scaffold)
+- **LIBRARIAN.md** (Consistency & Traceability) — owns `Sprint_Log.md`/`Story_Map.md` and is the only role that edits them after a story exists; BA adds the initial placeholder row when assigning a story ID (created by LIBRARIAN on first story, not part of the initial scaffold)
 - **BUSINESS_ANALYST.md** (User Stories & Requirements) — INVEST standard
 - **HUMAN_FACTORS_DESIGNER.md** (UX/UI) — gated on BA business rules first
 
