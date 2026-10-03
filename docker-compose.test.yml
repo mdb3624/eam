@@ -1,0 +1,44 @@
+services:
+  test-db:
+    image: postgis/postgis:16-3.4
+    container_name: eam-test-db
+    environment:
+      POSTGRES_DB: eam_test
+      # Bootstrap superuser, used ONLY by Flyway. Deliberately not eam_runtime: superusers
+      # bypass RLS unconditionally, so running the app as this user would make every RLS
+      # test pass for the wrong reason.
+      POSTGRES_USER: eam_test_admin
+      POSTGRES_PASSWORD: eam_admin
+      POSTGRES_INITDB_ARGS: "-c max_connections=400"
+    ports:
+      - "5434:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eam_test_admin -d eam_test"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  backend-test:
+    build:
+      context: ./backend
+    container_name: eam-test-backend
+    ports:
+      - "9191:9191"
+    depends_on:
+      test-db:
+        condition: service_healthy
+    environment:
+      PORT: 9191
+      DB_URL: jdbc:postgresql://test-db:5432/eam_test?currentSchema=eam
+      DB_USERNAME: eam_runtime
+      DB_PASSWORD: eam_runtime_pw
+      FLYWAY_DB_USERNAME: eam_test_admin
+      FLYWAY_DB_PASSWORD: eam_admin
+      DB_LOGIN_PASSWORD: eam_login
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9191/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s

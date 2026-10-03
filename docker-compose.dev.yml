@@ -1,0 +1,56 @@
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    environment:
+      POSTGRES_DB: eam_db
+      POSTGRES_USER: eam_admin
+      POSTGRES_PASSWORD: ${EAM_DB_ADMIN_PASSWORD:?set EAM_DB_ADMIN_PASSWORD in .env}
+    ports:
+      - "${EAM_DB_PORT:-5433}:5432"
+    volumes:
+      - eam_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eam_admin -d eam_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  backend:
+    build:
+      context: ./backend
+    environment:
+      PORT: 8180
+      DB_URL: jdbc:postgresql://db:5432/eam_db?currentSchema=eam
+      DB_USERNAME: eam_runtime
+      DB_PASSWORD: ${EAM_DB_RUNTIME_PASSWORD:?set EAM_DB_RUNTIME_PASSWORD in .env}
+      FLYWAY_DB_USERNAME: eam_admin
+      FLYWAY_DB_PASSWORD: ${EAM_DB_ADMIN_PASSWORD}
+      DB_LOGIN_PASSWORD: ${EAM_DB_LOGIN_PASSWORD:?set EAM_DB_LOGIN_PASSWORD in .env}
+    ports:
+      - "${EAM_BACKEND_PORT:-8180}:8180"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8180/actuator/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    environment:
+      VITE_PORT: 5273
+      VITE_API_URL: http://backend:8180
+      VITE_ALLOWED_HOST: ${VITE_ALLOWED_HOST:-}
+    ports:
+      - "${EAM_FRONTEND_PORT:-5273}:5273"
+    depends_on:
+      - backend
+
+volumes:
+  eam_postgres_data:
