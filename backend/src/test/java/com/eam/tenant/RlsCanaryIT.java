@@ -89,6 +89,7 @@ class RlsCanaryIT extends AbstractPostgresIT {
         TenantSeed.seedTenantWithUser(tenantB, emailB);
 
         List<String> seen = transactionTemplate.execute(status -> {
+            assertThat(emailsVisible()).isEmpty();
             TenantContextHolder.setTenantId(tenantB.toString());
             return emailsVisible();
         });
