@@ -204,7 +204,7 @@
                         <goals><goal>check</goal></goals>
                         <configuration>
                             <excludes>
-                                <exclude>com/eam/EamApplication</exclude>
+                                <exclude>com/eam/EamApplication.class</exclude>
                             </excludes>
                             <rules>
                                 <rule>

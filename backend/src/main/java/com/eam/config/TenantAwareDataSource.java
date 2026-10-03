@@ -27,15 +27,34 @@ public class TenantAwareDataSource extends DelegatingDataSource {
     @Override
     public Connection getConnection() throws SQLException {
         Connection connection = super.getConnection();
-        applyTenantContext(connection);
-        return wrapForReapplyOnTransactionBoundary(connection);
+        return prepare(connection);
     }
 
     @Override
     public Connection getConnection(String username, String password) throws SQLException {
         Connection connection = super.getConnection(username, password);
-        applyTenantContext(connection);
+        return prepare(connection);
+    }
+
+    private Connection prepare(Connection connection) throws SQLException {
+        try {
+            applyTenantContext(connection);
+        } catch (SQLException | RuntimeException e) {
+            try {
+                connection.close();
+            } catch (SQLException closeFailure) {
+                e.addSuppressed(closeFailure);
+            }
+            throw e;
+        }
         return wrapForReapplyOnTransactionBoundary(connection);
+    }
+
+    /** Shuts down the wrapped pool; Spring invokes this as the bean's destroy method. */
+    public void close() throws Exception {
+        if (getTargetDataSource() instanceof AutoCloseable closeable) {
+            closeable.close();
+        }
     }
 
     private void applyTenantContext(Connection connection) throws SQLException {

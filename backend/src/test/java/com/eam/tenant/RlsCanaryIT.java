@@ -114,6 +114,23 @@ class RlsCanaryIT extends AbstractPostgresIT {
         }
     }
 
+    @Test
+    void failsClosedAfterClearOnSameConnection() throws Exception {
+        UUID tenantA = UUID.randomUUID();
+        UUID tenantB = UUID.randomUUID();
+        String emailA = "a-" + tenantA + "@canary.test";
+        TenantSeed.seedTenantWithUser(tenantA, emailA);
+        TenantSeed.seedTenantWithUser(tenantB, "b-" + tenantB + "@canary.test");
+
+        TenantContextHolder.setTenantId(tenantA.toString());
+        try (Connection connection = dataSource.getConnection()) {
+            assertThat(visibleOn(connection)).containsExactly(emailA);
+            TenantContextHolder.clear();
+            connection.commit();
+            assertThat(visibleOn(connection)).isEmpty();
+        }
+    }
+
     private static List<String> visibleOn(Connection connection) throws Exception {
         List<String> emails = new ArrayList<>();
         try (Statement statement = connection.createStatement();
