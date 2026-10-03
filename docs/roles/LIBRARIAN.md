@@ -11,6 +11,7 @@
 - **Immediate Story_Map row on ID assignment (mandatory):** The moment a new story ID is chosen — even in DRAFT/BACKLOG status, even on a branch that won't merge for a while — add a placeholder row to `Story_Map.md` in the *same commit* as the story doc. Do not wait for merge to catalog. An ID that exists only on an unmerged branch is invisible to everyone else, and nothing stops it from being independently reused for unrelated work.
 - **Story close-out ships in the same PR as its code (mandatory):** The Sprint_Log entry and Story_Map status update for a story must land in the *same PR/branch* as the code that completes it — never split into a separate follow-up branch. A story is not actually reflected in the record until the record itself is merged.
 - **Post-merge branch cleanup:** run cleanup after every merge, not just at session end — orphaned/unmerged real work is easy to lose among dozens of already-merged branches that only *look* similarly stale.
+- **Flyway filename check:** Ensure every new migration filename matches `VYYYYMMDD_HHmm__Desc.sql` and that the story's sign-off records the migration version(s) it added.
 
 ## Document Ownership & Protection
 

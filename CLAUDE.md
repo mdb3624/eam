@@ -68,7 +68,7 @@ One-sentence status confirmations by default (`[Action completed]: [Result].`) �
 
 ## 🛠️ Technical Standards
 
-This project is not multi-tenant; no tenant-isolation rules apply.
+This project is multi-tenant (`tenant_id` + Postgres RLS on `app.current_tenant`). Full DB rules: `.claude/rules/postgres-native.md`. Migrations (Flyway): `database-migrations.md`. Environment, ports, and run commands: `ARCHITECTURE.md`. eam ports are backend 8180/9191, Postgres 5433/5434, Vite 5273 (not FreightClub's 9090/9091/5173).
 
 Full testing standards: `.claude/rules/testing_standards.md`. Full change-request protocol: `.claude/rules/change-request-protocol.md`. Workflow rules: `.claude/rules/workflow.md`.
 

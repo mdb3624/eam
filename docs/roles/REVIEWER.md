@@ -67,7 +67,10 @@
 * [ ] **Layering Integrity:** Domain/business logic has no direct dependency on infrastructure/framework code where the project's architecture calls for separation.
 
 ### 3. Data & Security (if applicable to this project)
-- [ ] N/A — this project is not multi-tenant.
+* [ ] **Database Migrations:** Does the Flyway script include `tenant_id`, `ENABLE ROW LEVEL SECURITY`, a tenant-isolation policy on `app.current_tenant`, and an explicit `GRANT` to `eam_runtime` (no `DELETE`)? Tables exempt under the session-token carve-out in `.claude/rules/postgres-native.md` are the only exception.
+* [ ] **Entity-Migration Parity:** Does this PR add any new `@Entity`? If yes, verify a corresponding migration exists (`VYYYYMMDD_HHmm__Desc.sql`). Orphaned entities without migrations fail `ddl-auto=validate`.
+* [ ] **Schema Type Consistency:** All id/code/string columns use `UUID`, `VARCHAR`, or `TEXT`, never `CHAR(n)`; timestamps are `TIMESTAMPTZ`.
+* [ ] **RLS Proof:** New tenant-owned tables are covered by a test that connects as `eam_runtime` (not the admin) and shows one tenant cannot read another's rows.
 
 ### 4. Reliability & Testing
 * [ ] **Backend Tests:** test suite passes with 0 failures; coverage floor/target as above.

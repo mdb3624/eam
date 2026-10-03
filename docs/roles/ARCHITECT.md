@@ -85,7 +85,8 @@ When handing off to CODER:
 2. Entity relationship diagram
 3. Domain model (class diagram with constraints)
 4. Validation rules per entity
-5. Soft-delete / multi-tenancy notes, if applicable to this project
+5. Soft-delete and multi-tenancy notes (this project is multi-tenant: RLS policy per tenant-owned table, per `.claude/rules/postgres-native.md`)
+6. Flyway migration plan: filename(s) per `database-migrations.md` and the grants each new table needs
 
 ---
 
