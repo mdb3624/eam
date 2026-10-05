@@ -40,3 +40,10 @@ Raw cyclomatic complexity alone is a poor risk signal: a fully-tested complex me
 | Test failure with no trace/artifact | Marked unreproducible, re-run required |
 | Missing AC traceability comment | Rejected (missing requirement link) |
 | Coverage < target | Story cannot be marked DONE |
+
+## CI Quality Reports (report-only)
+
+Both run in CI without blocking merge. Ratchet to blocking once the baseline is stable; never loosen a threshold to pass a build.
+
+- **Mutation report (pitest):** `./mvnw test-compile pitest:mutationCoverage` in `backend/`. Unit tests only (`*Test`); `*IT` classes need Docker. Catches tests that pass without exercising the code, which JaCoCo cannot see. Baseline 2026-10-05: 35 mutations, 31% killed, 73% test strength (config classes are covered by ITs, which this run skips).
+- **Endpoint overlap report:** `node scripts/endpoint-overlap/check-endpoint-overlap.mjs --base origin/main`. Flags a new endpoint whose resource already exists in another controller, and lists matching Story_Map lines. REVIEWER confirms the CODER.md Service Reuse Check step 5 was done or a CHG-### filed. `--strict` fails on controller overlap.
