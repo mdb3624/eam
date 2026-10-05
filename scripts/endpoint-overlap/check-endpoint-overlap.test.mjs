@@ -6,6 +6,7 @@ import {
   resourceKey,
   addedLinesByFile,
   findOverlaps,
+  storyIds,
 } from "./check-endpoint-overlap.mjs";
 
 const controller = `package com.eam.workorder;
@@ -105,4 +106,14 @@ test("findOverlaps ignores mappings in the controller that owns the new endpoint
     docs: [],
   });
   assert.equal(result[0].controllerHits.length, 0);
+});
+
+test("storyIds collapses doc hits to unique story ids, in first-seen order", () => {
+  const ids = storyIds([
+    { file: "Story_Map.md", line: "| US-013 | Create work order |" },
+    { file: "docs/project/stories/US-013-create-work-order.md", line: "Work order created" },
+    { file: "Story_Map.md", line: "| US-020 | Close work order |" },
+    { file: "notes.md", line: "no id here" },
+  ]);
+  assert.deepEqual(ids, ["US-013", "US-020"]);
 });

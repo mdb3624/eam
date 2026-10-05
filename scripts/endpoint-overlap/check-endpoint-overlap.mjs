@@ -64,6 +64,15 @@ const variants = (key) => {
   return [...new Set([key, spaced, spaced.replace(/s$/, "")])];
 };
 
+export function storyIds(docHits) {
+  const ids = new Set();
+  for (const h of docHits) {
+    const id = /US-\d+/.exec(h.line)?.[0] ?? /US-\d+/.exec(h.file)?.[0];
+    if (id) ids.add(id);
+  }
+  return [...ids];
+}
+
 export function findOverlaps({ newEndpoints, otherControllers, docs }) {
   return newEndpoints.map((endpoint) => {
     const key = resourceKey(endpoint.path);
@@ -113,8 +122,8 @@ function render(results) {
     for (const h of r.controllerHits) {
       out.push(`- OVERLAP: ${h.verb} ${h.path} in ${h.file}:${h.line}`);
     }
-    for (const h of r.docHits.slice(0, 5)) out.push(`- Story docs: ${h.file}: ${h.line}`);
-    if (r.docHits.length > 5) out.push(`- Story docs: ${r.docHits.length - 5} more matches`);
+    const ids = storyIds(r.docHits);
+    if (ids.length > 0) out.push(`- Stories mentioning "${r.key}": ${ids.join(", ")}`);
     out.push("");
   }
   out.push("REVIEWER: confirm each flagged capability was checked per CODER.md step 5, or a CHG-### was filed.");
