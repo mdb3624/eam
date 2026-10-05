@@ -99,6 +99,13 @@
             <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Pins the launcher to the Boot-managed JUnit version; without it pitest injects an
+             older launcher and the minion fails with "unaligned junit-platform versions". -->
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -221,6 +228,42 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+
+            <!-- Mutation testing: catches tests that pass without exercising the code (a 98%-line-
+                 coverage vacuous test shipped once in FreightClub). Not bound to the lifecycle;
+                 CI runs it report-only: ./mvnw test-compile pitest:mutationCoverage
+                 Unit tests only (*Test); *IT classes need Docker. Ratchet mutationThreshold up
+                 from 0 once there is a baseline. Never lower it to pass a build. -->
+            <plugin>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>1.17.4</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.pitest</groupId>
+                        <artifactId>pitest-junit5-plugin</artifactId>
+                        <version>1.2.1</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <targetClasses>
+                        <param>com.eam.*</param>
+                    </targetClasses>
+                    <targetTests>
+                        <param>com.eam.*Test</param>
+                    </targetTests>
+                    <excludedClasses>
+                        <param>com.eam.EamApplication</param>
+                    </excludedClasses>
+                    <mutationThreshold>0</mutationThreshold>
+                    <failWhenNoMutations>false</failWhenNoMutations>
+                    <outputFormats>
+                        <param>HTML</param>
+                        <param>XML</param>
+                    </outputFormats>
+                    <timestampedReports>false</timestampedReports>
+                </configuration>
             </plugin>
         </plugins>
     </build>

@@ -45,6 +45,49 @@ jobs:
           name: jacoco-report
           path: backend/target/site/jacoco/
 
+  # Report-only: surfaces vacuous tests the JaCoCo line/branch floor cannot see.
+  mutation:
+    name: Backend - Mutation Report (report-only)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: temurin
+          cache: maven
+
+      - name: Mutation coverage (unit tests only)
+        working-directory: backend
+        run: ./mvnw -B test-compile pitest:mutationCoverage
+
+      - name: Upload PIT report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pit-report
+          path: backend/target/pit-reports/
+
+  # Report-only: flags new endpoints whose resource already exists in another controller or
+  # story (CODER.md Service Reuse Check step 5). Switch to --strict once the report is quiet.
+  endpoint-overlap:
+    name: Endpoint Capability Overlap (report-only)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Script tests
+        run: node --test scripts/endpoint-overlap/*.test.mjs
+
+      - name: Overlap report
+        run: node scripts/endpoint-overlap/check-endpoint-overlap.mjs --base origin/${{ github.base_ref }}
+
   frontend:
     name: Frontend - Lint, Test and Build
     runs-on: ubuntu-latest
