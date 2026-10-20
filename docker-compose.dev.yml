@@ -27,6 +27,7 @@ services:
       FLYWAY_DB_USERNAME: eam_admin
       FLYWAY_DB_PASSWORD: ${EAM_DB_ADMIN_PASSWORD}
       DB_LOGIN_PASSWORD: ${EAM_DB_LOGIN_PASSWORD:?set EAM_DB_LOGIN_PASSWORD in .env}
+      EAM_JWT_SECRET: ${EAM_JWT_SECRET:?set EAM_JWT_SECRET in .env (min 32 bytes)}
     ports:
       - "${EAM_BACKEND_PORT:-8180}:8180"
     depends_on:

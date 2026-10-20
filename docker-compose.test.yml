@@ -36,6 +36,8 @@ services:
       FLYWAY_DB_USERNAME: eam_test_admin
       FLYWAY_DB_PASSWORD: eam_admin
       DB_LOGIN_PASSWORD: eam_login
+      # Test-only secret (>= 32 bytes). Never reuse outside the test stack.
+      EAM_JWT_SECRET: eam-test-stack-jwt-secret-not-for-production-use
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9191/actuator/health"]
       interval: 10s
