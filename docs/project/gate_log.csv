@@ -2,3 +2,4 @@ timestamp,story,gate,actor,verdict,reason_code,detail,outcome
 2026-10-20T00:00:00Z,US-001,BA_GATE1,Mike Barnes,PASS,,"ACs approved as written",pending
 2026-10-20T00:00:00Z,US-002,BA_GATE1,Mike Barnes,PASS,,"ACs approved as written",pending
 2026-10-20T00:00:00Z,US-001,ARCH_ACCEPT,ARCHITECT,PASS,,"Design complete, no lookup grant widening",pending
+2026-10-20T00:00:00Z,US-001,HFD_REVIEW,HFD,PASS,,"Field Contract Table clean; style guide v0 awaiting owner sign-off",pending

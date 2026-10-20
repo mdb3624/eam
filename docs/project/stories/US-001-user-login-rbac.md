@@ -2,7 +2,7 @@
 
 **Epic:** EPIC-01 Platform Foundation
 **Actor:** All MVP personas (Maria, Dwayne, Jess, Priya, Sam) — administered by Sam Whitfield, System Administrator
-**Status:** READY_FOR_DESIGN (ACs approved by Mike Barnes, 2026-10-20)
+**Status:** DESIGN_APPROVED pending style-guide sign-off (ACs approved 2026-10-20; ARCH design and HFD design complete)
 **Scope:** FULL_STACK
 
 ## User Story
