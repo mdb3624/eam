@@ -45,11 +45,140 @@ Scenario: A user without a role cannot access role-gated screens
 
 | UI Field | API Param | DB Column | Type | Required |
 |---|---|---|---|---|
-| Username/email | *(ARCH to fill)* | | | |
-| Password | *(ARCH to fill)* | | | |
-| Role badge (post-login) | *(ARCH to fill)* | | | |
+| Username/email | `email` (POST /api/v1/auth/login request) | `users.email` | string, max 320, email format | Yes |
+| Password | `password` (POST /api/v1/auth/login request, write-only, never returned) | `users.password_hash` (BCrypt; compared, never selected into a response) | string, 1-128 chars on input; VARCHAR(100) hash at rest | Yes |
+| Role badge (post-login) | `user.role` (login response and GET /api/v1/auth/me) | `users.role` | enum string: OPERATOR, DISPATCHER, FIELD_TECHNICIAN, MAINTENANCE_SUPERVISOR, SYSTEM_ADMIN; null = no role | No (null for a user with no role) |
+| N/A (session) | `accessToken` (login response) | none, signed JWT, not stored | string (JWT) | Yes on success |
+| N/A (session) | `expiresIn` (login response, seconds) | none, from `eam.auth.token-ttl` | integer | Yes on success |
+| N/A (error banner) | `code`, `message` (error body) | none | string | Yes on error |
+| N/A (backend only: disabled account message) | none | `users.enabled` | boolean, default true | Yes (DB), not exposed |
+
+**ARCH sign-off:** [x] Solution Architect, 2026-10-20 (design below)
 
 **BA sign-off:** [x] Mike Barnes — ACs approved 2026-10-20
 
 ## Decision Log
-- None yet.
+- 2026-10-20 (Mike Barnes): JWT access token only, no refresh tokens in this story.
+- 2026-10-20 (Mike Barnes): email is globally unique; tenant is found from the email at login.
+- 2026-10-20 (Mike Barnes): users are created by seed/test fixtures only; admin create-user is a later story.
+- 2026-10-20 (ARCH): login does not widen `eam_login_lookup` grants. See Architect Design, "Login flow".
+
+## Architect Design (ARCHITECT, 2026-10-20)
+
+**Input Acceptance Gate:** ACCEPT. 3 ACs, measurable, edge cases named, no implementation detail, no contradictions, fits a few days. Platform Reuse Check: no existing auth service or user-facing login capability in the codebase or Story_Map; US-003 (audit) consumes the user id this story binds to `TenantContextHolder`.
+
+### Schema (migration `V20261020_0900__Add_user_credentials_and_role.sql`)
+
+`eam.users` is tenant-owned and already has RLS, `(tenant_id, deleted_at)` index and runtime grants. Add columns only; no new table, so no new policy or grant.
+
+| Column | Type | Null | Notes |
+|---|---|---|---|
+| `password_hash` | VARCHAR(100) | yes | BCrypt. Null means the account cannot log in. |
+| `role` | VARCHAR(30) | yes | CHECK in the five role values. Null means authenticated but no role (AC 3). |
+| `enabled` | BOOLEAN | no, default TRUE | FALSE = disabled by an administrator (edge case). |
+
+Plus `CREATE UNIQUE INDEX uq_users_email_active ON eam.users (lower(email)) WHERE deleted_at IS NULL;` so email is globally unique among active users (decision above). The index is enforced by the database regardless of RLS.
+
+`eam_login_lookup` grants stay unchanged (`id, tenant_id, email, deleted_at`). It is used only to resolve `email -> (user id, tenant id)`. Everything else is read through `eam_runtime` after the tenant is bound, under RLS.
+
+### Login flow
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant A as AuthController
+    participant S as AuthService
+    participant L as LoginLookup (eam_login_lookup)
+    participant R as UserRepository (eam_runtime, RLS)
+    C->>A: POST /api/v1/auth/login {email, password}
+    A->>S: login(email, password)
+    S->>L: findActiveByEmail(lower(email))
+    alt not found
+        S->>S: BCrypt compare against dummy hash (equalise timing)
+        S-->>A: InvalidCredentials -> 401 INVALID_CREDENTIALS
+    else found (userId, tenantId)
+        S->>S: bind tenant (finally: clear)
+        S->>R: findById(userId) under RLS
+        alt hash null or password mismatch
+            S-->>A: InvalidCredentials -> 401 INVALID_CREDENTIALS
+        else enabled = false
+            S-->>A: AccountDisabled -> 403 ACCOUNT_DISABLED
+        else ok
+            S-->>A: JWT {sub=userId, tid=tenantId, role?}
+        end
+    end
+```
+
+- The disabled check runs only after the password verifies, so an attacker cannot learn account status without the password. Wrong password and unknown email return the same 401 body.
+- JWT: HS256 via the existing jjwt dependency. Claims `sub` (user id), `tid` (tenant id), `role` (omitted when null), `iat`, `exp`. TTL from `eam.auth.token-ttl`, default `PT1H`. Secret from `EAM_JWT_SECRET` (min 32 bytes; startup fails if shorter).
+- `JwtAuthenticationFilter` (before `UsernamePasswordAuthenticationFilter`): parse and verify the Bearer token, set the `SecurityContext` with authority `ROLE_<role>` when a role is present, bind tenant and user via `TenantContextHolder`, and `clear()` in `finally`. Invalid or expired token: no authentication set, entry point returns 401.
+- `SecurityConfig`: `permitAll` on `/actuator/health` and `POST /api/v1/auth/login`; everything else authenticated. Remove `httpBasic`. Add `@EnableMethodSecurity` so later stories gate with `@PreAuthorize`. 403 handler returns the `ACCESS_DENIED` body.
+- Role gating mechanism only. No Dispatch board API exists yet (US-014). AC 3 is proven with a probe controller in test sources annotated `@PreAuthorize("hasRole('DISPATCHER')")`.
+
+### API contract
+
+| Endpoint | Auth | Request | Success | Errors |
+|---|---|---|---|---|
+| `POST /api/v1/auth/login` | none | `{email, password}` both `@NotBlank`, email `@Email` | 200 `{accessToken, tokenType:"Bearer", expiresIn, user:{id, email, role}}` | 400 validation, 401 `INVALID_CREDENTIALS`, 403 `ACCOUNT_DISABLED` |
+| `GET /api/v1/auth/me` | Bearer | none | 200 `{id, email, role}` | 401 |
+
+Error body record: `ApiError(String code, String message)`. Messages: `INVALID_CREDENTIALS` "Invalid email or password."; `ACCOUNT_DISABLED` "This account is disabled. Contact your administrator."; `ACCESS_DENIED` "You do not have access to this screen." Password and token never appear in logs.
+
+### Domain model
+
+- `User` entity (`com.eam.auth`): id UUID, tenantId UUID, email, passwordHash, role (`Role` enum, nullable), enabled, createdAt, updatedAt, deletedAt. Mapped read-mostly; no write endpoints in this story.
+- `Role` enum: `OPERATOR, DISPATCHER, FIELD_TECHNICIAN, MAINTENANCE_SUPERVISOR, SYSTEM_ADMIN` (from Personas.md).
+- `LoginLookupRepository` (JDBC, own `DataSource` bean `loginLookupDataSource` as `eam_login_lookup`, not the primary). This closes the "Not yet wired" note in ARCHITECTURE.md.
+- Validation: request DTO records with `@Valid` at the controller (trust boundary); no re-validation inside the service.
+
+### Multi-tenancy and soft delete
+
+`users` queries run under RLS with the tenant bound, plus the application-side filter `deleted_at IS NULL`. The lookup query also filters `deleted_at IS NULL`. No cross-tenant joins. Writes: none in this story.
+
+### Flyway plan
+
+One migration: `V20261020_0900__Add_user_credentials_and_role.sql`, header comment explains why lookup grants are unchanged. `MigrationIT` extended to assert the columns, CHECK and unique index.
+
+### Config wiring (CODER must verify, per CODER.md)
+
+New property `EAM_JWT_SECRET` -> `eam.auth.jwt-secret` in `application.yml`; pass through `docker-compose.dev.yml`, `docker-compose.test.yml`, `.env.example` and the CI workflow env. Hit the real `/api/v1/auth/login` in the test stack and paste the response in the story.
+
+### Frontend (data display requirements only; layout belongs to HFD)
+
+- Screens: Login; role home placeholder per role; "access denied" state; session-expired return to Login.
+- Role to home route: OPERATOR `/alarms`, DISPATCHER `/dispatch`, FIELD_TECHNICIAN `/work`, MAINTENANCE_SUPERVISOR `/closure`, SYSTEM_ADMIN `/admin`. Each is a placeholder titled with the screen name until its own story ships.
+- Navigation shows only items for screens that exist for the user role. A user with no role sees no navigation and an access denied message.
+- Token kept in `sessionStorage`; a 401 from any API call clears it and routes to Login with the session-expired message.
+
+### Known gaps carried as debt (not blocking)
+
+- A disabled or deleted user keeps a valid token until it expires (TTL 1h). Revocation arrives with refresh tokens.
+- No login rate limiting or lockout. Needs its own story.
+
+## Files in Scope
+
+backend/pom.xml
+backend/src/main/resources/application.yml
+backend/src/main/resources/db/migration/V20261020_0900__Add_user_credentials_and_role.sql
+backend/src/main/java/com/eam/auth/**
+backend/src/main/java/com/eam/config/SecurityConfig.java
+backend/src/main/java/com/eam/config/LoginLookupDataSourceConfig.java
+backend/src/test/java/com/eam/auth/**
+backend/src/test/java/com/eam/support/**
+backend/src/test/java/com/eam/db/MigrationIT.java
+backend/src/test/resources/**
+frontend/package.json
+frontend/package-lock.json
+frontend/src/**
+docker-compose.dev.yml
+docker-compose.test.yml
+.env.example
+.github/workflows/**
+ARCHITECTURE.md
+docs/design/US-001/**
+docs/project/stories/US-001-user-login-rbac.md
+docs/project/Story_Map.md
+docs/project/Sprint_Log.md
+docs/project/gate_log.csv
+docs/standards/style-guide.md
+
