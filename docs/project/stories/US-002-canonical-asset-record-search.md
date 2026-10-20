@@ -2,7 +2,7 @@
 
 **Epic:** EPIC-01 Platform Foundation
 **Actor:** Maria Alvarez, Control-Center Operator
-**Status:** DRAFT — awaiting story owner approval
+**Status:** READY_FOR_DESIGN (ACs approved by Mike Barnes, 2026-10-20)
 **Scope:** FULL_STACK
 
 ## User Story
@@ -49,7 +49,7 @@ Scenario: Searching a non-existent Asset ID
 | Manufacturer/model/serial | *(ARCH to fill)* | | | |
 | Hierarchy path (utility→substation→feeder→asset) | *(ARCH to fill)* | | | |
 
-**BA sign-off:** [x] Mike Barnes — pending story-owner approval of ACs
+**BA sign-off:** [x] Mike Barnes — ACs approved 2026-10-20
 
 ## Decision Log
 - None yet.

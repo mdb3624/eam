@@ -2,7 +2,7 @@
 
 **Epic:** EPIC-01 Platform Foundation
 **Actor:** All MVP personas (Maria, Dwayne, Jess, Priya, Sam) — administered by Sam Whitfield, System Administrator
-**Status:** DRAFT — awaiting story owner approval
+**Status:** READY_FOR_DESIGN (ACs approved by Mike Barnes, 2026-10-20)
 **Scope:** FULL_STACK
 
 ## User Story
@@ -49,7 +49,7 @@ Scenario: A user without a role cannot access role-gated screens
 | Password | *(ARCH to fill)* | | | |
 | Role badge (post-login) | *(ARCH to fill)* | | | |
 
-**BA sign-off:** [x] Mike Barnes — pending story-owner approval of ACs (flips status to `READY_FOR_DESIGN`)
+**BA sign-off:** [x] Mike Barnes — ACs approved 2026-10-20
 
 ## Decision Log
 - None yet.

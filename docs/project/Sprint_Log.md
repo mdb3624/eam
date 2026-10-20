@@ -19,3 +19,11 @@ Owned by LIBRARIAN. Append-only decision/status log.
 - **Boundary (non-negotiable):** Fast-Track never applies to AC pass/fail criteria, schema/contract shape, or business/compliance/money logic. Anything in that category is a CHG-### escalation to LIBRARIAN as before — a Fast-Track note covering a structural issue is a Sequential Lock violation, not a valid exception, and REVIEWER must reject it regardless of the inline note.
 - **Traceability requirement:** Every Fast-Track use must produce a `[FAST-TRACK]` entry in the Technical Debt Ledger (or the story's own file) — LIBRARIAN logs this even when no CHG-### ticket exists, so the decision remains auditable.
 - **Reference:** `docs/project/RACI_Design_Flow.md` reflects this pattern in its Fast-Track rows for BA, ARCHITECT, HFD, and CODER.
+
+## 2026-10-20 — Gate 1: US-001 and US-002 ACs Approved
+
+- **Action:** Story owner (Mike Barnes) approved the ACs of US-001 and US-002 as written. Both move DRAFT → READY_FOR_DESIGN.
+- **Build order decision:** US-001 first, then US-002. US-002 needs a tenant bound to web requests, which only US-001 provides.
+- **US-001 scoping decisions:** stateless JWT access token (no refresh tokens yet); email is globally unique, so login finds the tenant from the email via `eam_login_lookup`; users are created by seed/test fixtures only (no admin create-user endpoint, to be storied later).
+- **US-002 scoping decisions:** assets modeled as one self-referencing table (`asset_type` + `parent_id`) covering substation, feeder and transformer; the tenant is the utility, so no utility row; FULL_STACK, HFD included.
+- **Branching:** scaffold is not on `main` yet; feature branches are cut from `chore/story-scope-guard-and-sprint-backlog`, which sits on `chore/quality-gates`.
