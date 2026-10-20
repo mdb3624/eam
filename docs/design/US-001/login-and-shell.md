@@ -1,6 +1,6 @@
 # US-001 HFD Design: Login and Role Shell
 
-Status: READY_FOR_CODER once Mike Barnes signs off `docs/standards/style-guide.md`.
+Status: READY_FOR_CODER. Style guide v1 approved by Mike Barnes, 2026-10-20.
 Inputs: US-001 ACs (approved), Architect design and Field Contract Table (signed), `docs/standards/style-guide.md`.
 Scope: display and interaction only. API shape is in the story's Architect Design.
 
@@ -8,41 +8,33 @@ Scope: display and interaction only. API shape is in the story's Architect Desig
 
 ### 1. Login (`/login`)
 
+Reference render: `style-guide-poc.html` (Login, Wrong password, Disabled account tabs).
+
 ```
-+--------------------------------------------+
-|                    EAM                     |
-|        Asset and Field Operations          |
-|  +--------------------------------------+  |
-|  | Error: Invalid email or password.    |  |  <- only on failure, role="alert"
-|  +--------------------------------------+  |
-|  Email                                     |
-|  [ name@utility.com                     ]  |
-|  Password                                  |
-|  [ ********                             ]  |
-|  [            Sign in                    ]  |
-+--------------------------------------------+
++---------------------------+--------------------------+
+| [hex bolt] EAM            |  Sign in                 |
+|                           |  Use your utility email. |
+|  grid + power-line art    |  [Error: ...]  (on fail) |
+|                           |  Email                   |
+|  Know the asset.          |  [ name@utility.com   ]  |
+|  Act on the alarm.        |  Password                |
+|  One canonical record...  |  [ ********           ]  |
+|                           |  [      Sign in       ]  |
++---------------------------+--------------------------+
 ```
 
-- Single column, card centered, max width 400px, `--space-6` padding.
+- Two-pane card per the style guide. Form pane is the only interactive area.
 - Field order: email, password, submit. Email first because it is what the user knows first; the tenant is derived from it, so there is no utility field (Rule 1).
-- `autocomplete="username"` on email, `autocomplete="current-password"` on password so the browser fills both (Rule 1).
-- Autofocus the email input on load. Enter submits.
-- Submit disabled while the request is in flight and shows "Signing in...". Disabled also when email or password is empty.
-- Banner messages come from the API `message` field verbatim: invalid credentials (401), disabled account (403, different text), and "Your session expired. Sign in again." when redirected after a 401.
-- Client validation: required + email format on blur, message "Enter a valid email address." The password is never trimmed or echoed.
+- `autocomplete="username"` on email and `autocomplete="current-password"` on password so the browser fills both (Rule 1). Autofocus email. Enter submits.
+- Submit disabled while the request is in flight (label "Signing in...") and while email or password is empty.
+- Banner text comes from the API `message` verbatim: invalid credentials (401), disabled account (403, different text), and "Your session expired. Sign in again." after a 401 redirect.
+- Client validation: required and email format on blur, message "Enter a valid email address." The password is never trimmed or echoed.
 
 ### 2. Role shell (all authenticated routes)
 
-```
-+----------------------------------------------------------+
-| EAM    [ Dispatch board ]            Maria A. [Dispatcher] [Sign out] |
-+----------------------------------------------------------+
-|  <screen content>                                        |
-+----------------------------------------------------------+
-```
+Left sidebar per the style guide: logo, nav, user card (email, role badge, Sign out) at the bottom.
 
-- Top bar: product name, navigation items for the user role, user email, role badge, Sign out button.
-- Navigation items per role (only screens that exist; placeholders until their stories ship):
+- Navigation items per role (only screens that exist; placeholders until their stories ship). Icons: bell (alarms), board (dispatch), wrench (work), check (closure), person (admin).
 
 | Role | Home route | Nav items |
 |---|---|---|
@@ -52,9 +44,10 @@ Scope: display and interaction only. API shape is in the story's Architect Desig
 | MAINTENANCE_SUPERVISOR | `/closure` | Work order closure |
 | SYSTEM_ADMIN | `/admin` | Administration |
 
-- Active item has a 3px bottom border in `--color-primary` plus `aria-current="page"` (not color alone, bold weight too).
-- Role badge shows display names: Control-Center Operator, Dispatcher, Field Technician, Maintenance Supervisor, System Administrator.
-- Placeholder screen body: heading with the screen name and the line "This screen is coming in a later release."
+- Active item: fill, 3px left border, bold, `aria-current="page"` (not color alone).
+- Role badge display names: Control-Center Operator, Dispatcher, Field Technician, Maintenance Supervisor, System Administrator.
+- Placeholder body: eyebrow with role name, heading with the screen name, line "This screen is coming in a later release."
+- Theme toggle (dark default, light option) lives in the user card; remembered in `localStorage` with a safe fallback.
 - Sign out clears the token and returns to `/login`.
 
 ### 3. Access denied (in shell, any role-gated route the user cannot open)
@@ -72,7 +65,7 @@ Scope: display and interaction only. API shape is in the story's Architect Desig
 ## Accessibility
 
 - Labels bound to inputs with `htmlFor`. Error banner `role="alert"` so it is announced. Field errors tied by `aria-describedby`, inputs get `aria-invalid="true"`.
-- Full keyboard path: tab order is email, password, submit. Visible focus ring everywhere (style guide).
+- Full keyboard path: tab order is email, password, submit. Visible focus ring everywhere (style guide v1).
 - Contrast values in the style guide meet WCAG AA. Errors carry the "Error:" text label.
 - Touch targets are at least 44px.
 
@@ -83,7 +76,7 @@ Scope: display and interaction only. API shape is in the story's Architect Desig
 | Sign in button | primary | primary darkened 8% | 2px ring | 50% opacity | "Signing in..." | n/a |
 | Inputs | border | border darkened | 2px ring | n/a | n/a | danger border + message |
 
-Responsive: single breakpoint at 640px. Below it the top bar wraps to two rows (brand and Sign out on the first, nav on the second); the login card goes full width with `--space-4` gutters.
+Responsive: single breakpoint at 760px. Below it the sidebar becomes a top row with horizontally scrolling nav, and the login brand pane stacks above the form at reduced height.
 
 ## Test ids
 
@@ -111,6 +104,6 @@ Responsive: single breakpoint at 640px. Below it the top bar wraps to two rows (
 - [x] Accessibility verified on paper (contrast, ARIA, keyboard)
 - [x] Field Contract Table reviewed row by row: every UI field has an API param and DB column or a written N/A, no type mismatches, no duplicate param names
 
-## Open item for Mike
+## Note
 
-- Sign off `docs/standards/style-guide.md` (HFD role doc says no style guide exists; role docs are protected, so I did not edit them. Update the HFD role doc text once you approve.)
+- The HFD role doc still says no style guide exists. Role docs are protected; update that text to point at `docs/standards/style-guide.md`.
