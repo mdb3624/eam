@@ -2,7 +2,7 @@
 
 **Epic:** EPIC-01 Platform Foundation
 **Actor:** All MVP personas (Maria, Dwayne, Jess, Priya, Sam) — administered by Sam Whitfield, System Administrator
-**Status:** DESIGN_APPROVED (ACs approved 2026-10-20; ARCH and HFD design complete; style guide v1 approved)
+**Status:** CODE_REVIEW (implementation complete 2026-10-20, awaiting REVIEWER and LIBRARIAN)
 **Scope:** FULL_STACK
 
 ## User Story
@@ -182,3 +182,32 @@ docs/project/Sprint_Log.md
 docs/project/gate_log.csv
 docs/standards/style-guide.md
 
+
+## Coder Evidence (2026-10-20)
+
+**Migration added:** `V20261020_0900__Add_user_credentials_and_role.sql`.
+
+**Backend** (`./mvnw.cmd verify`): checkstyle 0 violations, PMD clean, JaCoCo gate passed. 34 unit tests and 29 integration tests, 0 failures (`JwtServiceTest`, `AuthServiceTest`, `AuthControllerTest`, `AuthIT`, `MigrationIT`, `RlsCanaryIT`, `HealthEndpointIT`, `TenantContextHolderTest`).
+
+**Frontend:** `npm run lint` clean, `npm run build` clean, 41 Vitest tests passing.
+
+**AC to test map**
+
+| AC | Tests |
+|---|---|
+| Successful login routes to role home | `AuthIT.dispatcherLogsInAndTokenCarriesTheirRole`, `App.test.tsx` "AC 1" group (all five roles) |
+| Invalid credentials rejected, no session | `AuthIT.wrongPasswordAndUnknownEmailGetTheSame401AndNoToken`, `App.test.tsx` "AC 2" group |
+| No role cannot reach role-gated screens | `AuthIT.dispatcherReachesRoleGatedEndpointAndOtherRolesAndNoRoleAreDenied`, `App.test.tsx` "AC 3" group |
+| Edge: disabled account | `AuthIT.disabledAccountGetsDistinctMessageOnlyWithCorrectPassword`, `AuthServiceTest`, App "disabled account" |
+| Edge: session expiry | `AuthIT.expiredTokenIsRejected`, `App.test.tsx` "expired stored token" |
+
+**External config wiring (EAM_JWT_SECRET):** declared in `application.yml`, `docker-compose.dev.yml` (required), `docker-compose.test.yml` (test-only value), `.env.example`. Tests supply their own via `AbstractPostgresIT`; CI needs no extra env.
+
+**Live smoke on the real test stack** (`docker-compose.test.yml`, port 9191, user seeded with a pgcrypto BCrypt hash):
+- `POST /api/v1/auth/login` dispatcher: 200, `expiresIn` 3600, role `DISPATCHER`, token 259 chars.
+- `GET /api/v1/auth/me` with that token: 200, same user. Without token: 401. Wrong password: 401 `INVALID_CREDENTIALS`.
+- Browser (Vite on 5273 proxied to 9191): login landed on `/dispatch`, nav showed only "Dispatch board", badge "Dispatcher"; reload kept the session; `/alarms` showed Access denied with a home link; Sign out returned to `/login`. 0 console errors after the first page load (1 error on the initial load not investigated, likely favicon).
+
+**Defect found and fixed during build:** exposing a second `JdbcTemplate` bean for the lookup pool made `RlsCanaryIT` see all tenants (the auto-configured runtime template backed off). Removed the bean; recorded in ARCHITECTURE.md.
+
+**Not done / carried:** visual parity check against `style-guide-poc.html` was by accessibility tree only (screenshots were not viewable); REVIEWER audit; LIBRARIAN sign-off; Sprint_Log close-out.

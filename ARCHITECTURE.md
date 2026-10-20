@@ -33,7 +33,12 @@ Java 21, Spring Boot 3.5, Maven wrapper, PostgreSQL 16 (PostGIS image, extension
 - Test stack: `docker compose -f docker-compose.test.yml up --build -d`, health at `http://localhost:9191/actuator/health`.
 - Per the maintainer's global rules, run Docker operations through the Docker MCP tool, not raw docker CLI.
 
-## Not yet wired
-`eam_login_lookup` has a role and grants but no `DataSource` bean yet; US-001 (login/RBAC) adds it with the JWT filter. `httpBasic` in `SecurityConfig` is a placeholder until then.
+## Auth (US-001)
+- Stateless JWT (HS256, `EAM_JWT_SECRET` min 32 bytes, TTL `eam.auth.token-ttl`, default PT1H). Claims: `sub` user id, `tid` tenant id, `role` (absent = no role).
+- `POST /api/v1/auth/login` is the only public API route. `JwtAuthenticationFilter` authenticates Bearer tokens, binds tenant and user in `TenantContextHolder`, and clears them in `finally`. Role gating uses `@PreAuthorize` (method security is on).
+- Login finds the tenant from the email through `eam_login_lookup` (own pool, `LoginLookupDataSourceConfig`), then reads the user, password hash, role and enabled flag as `eam_runtime` under RLS. Lookup grants are unchanged.
+- Do not expose a `JdbcTemplate` bean for the lookup pool: Spring Boot would back off its own, and every `@Autowired JdbcTemplate` would silently run as the cross-tenant lookup role.
+- Known gaps: a disabled user keeps a valid token until it expires; no login rate limiting or lockout.
 
-The `EntityManagerHolder` branch of `TenantContextHolder` (re-applying the tenant to an already-open JPA transaction) is covered by `RlsCanaryIT.settingTenantInsideAnOpenTransactionTakesEffect`; re-verify once the first JPA entity exists.
+## Not yet wired
+The `EntityManagerHolder` branch of `TenantContextHolder` (re-applying the tenant to an already-open JPA transaction) is covered by `RlsCanaryIT.settingTenantInsideAnOpenTransactionTakesEffect`; re-verify once the first JPA write path exists.
