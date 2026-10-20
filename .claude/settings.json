@@ -15,6 +15,15 @@
             "command": "bash .claude/hooks/block-raw-search-tools.sh"
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/story-scope-guard.sh"
+          }
+        ]
       }
     ]
   }
