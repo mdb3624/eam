@@ -54,6 +54,9 @@ public abstract class AbstractPostgresIT {
         registry.add("spring.flyway.password", () -> ADMIN_PASSWORD);
         registry.add("spring.flyway.placeholders.runtime_password", () -> RUNTIME_PASSWORD);
         registry.add("spring.flyway.placeholders.login_lookup_password", () -> LOGIN_PASSWORD);
+        registry.add("eam.login-lookup.username", () -> LOGIN_USER);
+        registry.add("eam.login-lookup.password", () -> LOGIN_PASSWORD);
+        registry.add("eam.auth.jwt-secret", () -> "integration-test-secret-integration-test-secret");
     }
 
     public static Connection adminConnection() throws SQLException {

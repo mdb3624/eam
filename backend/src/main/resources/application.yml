@@ -20,6 +20,14 @@ spring:
     hibernate:
       ddl-auto: validate
 
+eam:
+  auth:
+    jwt-secret: ${EAM_JWT_SECRET}
+    token-ttl: PT1H
+  login-lookup:
+    username: eam_login_lookup
+    password: ${DB_LOGIN_PASSWORD}
+
 server:
   port: ${PORT:8180}
 

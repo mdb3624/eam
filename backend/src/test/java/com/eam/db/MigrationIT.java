@@ -87,4 +87,75 @@ class MigrationIT extends AbstractPostgresIT {
                     .hasMessageContaining("permission denied");
         }
     }
+
+    // Story: US-001. Schema for credentials, role and disabled flag.
+
+    @Test
+    void usersHaveCredentialRoleAndEnabledColumnsWithSafeDefaults() throws Exception {
+        UUID tenantId = UUID.randomUUID();
+        TenantSeed.seedTenantWithUser(tenantId, "defaults-" + tenantId + "@example.com");
+
+        try (Connection admin = adminConnection();
+             Statement statement = admin.createStatement();
+             ResultSet rs = statement.executeQuery(
+                     "SELECT password_hash, role, enabled FROM eam.users WHERE tenant_id = '" + tenantId + "'")) {
+            rs.next();
+            assertThat(rs.getString("password_hash")).isNull();
+            assertThat(rs.getString("role")).isNull();
+            assertThat(rs.getBoolean("enabled")).isTrue();
+        }
+    }
+
+    @Test
+    void roleColumnRejectsValuesOutsideTheFiveMvpRoles() throws Exception {
+        UUID tenantId = UUID.randomUUID();
+        TenantSeed.seedTenant(tenantId);
+
+        assertThatThrownBy(() -> TenantSeed.seedUser(
+                tenantId, "badrole-" + tenantId + "@example.com", null, "GOD_MODE", true))
+                .isInstanceOf(SQLException.class)
+                .hasMessageContaining("users_role_check");
+        TenantSeed.seedUser(tenantId, "okrole-" + tenantId + "@example.com", null, "DISPATCHER", true);
+    }
+
+    @Test
+    void activeEmailIsUniqueAcrossTenantsIgnoringCase() throws Exception {
+        UUID tenantA = UUID.randomUUID();
+        UUID tenantB = UUID.randomUUID();
+        String email = "dup-" + tenantA + "@example.com";
+        TenantSeed.seedTenant(tenantA);
+        TenantSeed.seedTenant(tenantB);
+        TenantSeed.seedUser(tenantA, email, null, null, true);
+
+        assertThatThrownBy(() -> TenantSeed.seedUser(tenantB, email.toUpperCase(), null, null, true))
+                .isInstanceOf(SQLException.class)
+                .hasMessageContaining("uq_users_email_active");
+    }
+
+    @Test
+    void emailCanBeReusedAfterSoftDelete() throws Exception {
+        UUID tenantId = UUID.randomUUID();
+        String email = "reuse-" + tenantId + "@example.com";
+        TenantSeed.seedTenant(tenantId);
+        UUID first = TenantSeed.seedUser(tenantId, email, null, null, true);
+        try (Connection admin = adminConnection(); Statement statement = admin.createStatement()) {
+            statement.executeUpdate("UPDATE eam.users SET deleted_at = CURRENT_TIMESTAMP WHERE id = '" + first + "'");
+        }
+
+        TenantSeed.seedUser(tenantId, email, null, null, true);
+    }
+
+    @Test
+    void loginLookupRoleCannotReadPasswordHashOrRole() throws Exception {
+        try (Connection login = loginLookupConnection(); Statement statement = login.createStatement()) {
+            assertThatThrownBy(() -> statement.executeQuery("SELECT password_hash FROM eam.users"))
+                    .isInstanceOf(SQLException.class)
+                    .hasMessageContaining("permission denied");
+        }
+        try (Connection login = loginLookupConnection(); Statement statement = login.createStatement()) {
+            assertThatThrownBy(() -> statement.executeQuery("SELECT role FROM eam.users"))
+                    .isInstanceOf(SQLException.class)
+                    .hasMessageContaining("permission denied");
+        }
+    }
 }
