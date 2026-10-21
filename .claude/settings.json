@@ -22,6 +22,10 @@
           {
             "type": "command",
             "command": "bash .claude/hooks/story-scope-guard.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/visual-evidence-guard.sh"
           }
         ]
       }

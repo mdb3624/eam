@@ -88,6 +88,23 @@ jobs:
       - name: Overlap report
         run: node scripts/endpoint-overlap/check-endpoint-overlap.mjs --base origin/${{ github.base_ref }}
 
+  # Blocking: a UI story at CODE_REVIEW or later must have valid screenshots and, past
+  # REVIEW_PASSED, a REVIEWER VISUAL PASS (docs/standards/Definition_of_Done.md). Backstop for
+  # status edits that bypass the local hook.
+  visual-evidence:
+    name: Visual Evidence Gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Script tests
+        run: node --test scripts/visual-check/*.test.mjs
+
+      - name: Check gated UI stories
+        run: node scripts/visual-check/check-visual-evidence.mjs --all
+
   frontend:
     name: Frontend - Lint, Test and Build
     runs-on: ubuntu-latest

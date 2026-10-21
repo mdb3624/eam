@@ -8,7 +8,7 @@ One row per gate decision, appended to `docs/project/gate_log.csv`. Purpose: mea
 |---|---|
 | `timestamp` | UTC, ISO 8601 |
 | `story` | `US-###`, `CHG-###`, `INF-###`, `SEC-###` |
-| `gate` | `BA_GATE1`, `ARCH_ACCEPT`, `HFD_REVIEW`, `CODER_SCOPE`, `CODER_DONE`, `REVIEWER` |
+| `gate` | `BA_GATE1`, `ARCH_ACCEPT`, `HFD_REVIEW`, `CODER_SCOPE`, `CODER_DONE`, `REVIEWER`, `VISUAL` |
 | `actor` | Role name, or `hook` for the scope guard |
 | `verdict` | `PASS`, `KICK_BACK`, `CHANGE_REQUEST`, `WARN`, `BLOCK` |
 | `reason_code` | One value from the list below. Required unless `PASS`. |
@@ -26,6 +26,8 @@ One row per gate decision, appended to `docs/project/gate_log.csv`. Purpose: mea
 | `DUPLICATE_CAPABILITY` | The story repeats an existing capability |
 | `SPEC_AMBIGUOUS` | The story or design was unclear enough to stop work |
 | `SECURITY` | Access control, tenant isolation, or data exposure issue |
+| `EVIDENCE_MISSING` | A gated status change was attempted without valid visual evidence (hook rows) |
+| `VISUAL_DEFECT` | A screenshot shows a defect: overlap, clipping, overflow, wrong screen, contrast |
 | `OTHER` | Anything else. Say what in `detail`. |
 
 ## Who writes what
@@ -33,6 +35,10 @@ One row per gate decision, appended to `docs/project/gate_log.csv`. Purpose: mea
 - **The scope-guard hook** writes `CODER_SCOPE` rows automatically (`.claude/hooks/story-scope-guard.sh`). It logs each story-and-file pair once.
 - **Each role** appends its own verdict row when it signs off or kicks a story back. REVIEWER always writes a row, `PASS` included, so pass rates are measurable.
 - **The weekly audit** fills in `outcome` for the week's rows and reports: kick-backs per gate, top reason codes, and `Size`/`Risk` tags against actual rework.
+
+## VISUAL rows
+
+`VISUAL` rows are written by the visual-evidence hook (`hook`, `BLOCK` or `WARN`, `EVIDENCE_MISSING`) and by REVIEWER after opening every screenshot in `docs/project/evidence/<ID>/` (`PASS`, or `KICK_BACK` with `VISUAL_DEFECT`). The gate reads these rows: `REVIEW_PASSED` and later statuses need a REVIEWER `VISUAL PASS` newer than the evidence.
 
 ## What this is not
 

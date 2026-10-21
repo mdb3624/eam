@@ -57,6 +57,7 @@ Use this checklist for every UI story before declaring `READY_FOR_CODER`:
 - [ ] Interactive states documented (hover, focus, loading, disabled)
 - [ ] Accessibility verified (contrast ratios, ARIA labels, keyboard nav)
 - [ ] Field Contract Table reviewed (every UI field → API param → DB column), if applicable
+- [ ] `docs/design/<ID>/visual-checks.json` authored: every screen and state, phone and desktop width, every theme, and `expectText` unique to the correct screen (it is how the capture proves a shot is not the login page or an error page). CODER and REVIEWER are gated on this.
 
 ## ⚠️ Anti-Patterns (Forbidden)
 

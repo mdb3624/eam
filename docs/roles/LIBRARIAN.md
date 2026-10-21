@@ -52,6 +52,10 @@ When marking a story "DONE", append a `## Librarian Sign-Off` section directly t
 **Date:** YYYY-MM-DD
 ```
 
+## Visual evidence in the lifecycle
+
+For `FULL_STACK` and `UI_ONLY` stories: `CODE_REVIEW` needs valid screenshots in `docs/project/evidence/<ID>/`; `REVIEW_PASSED` and later need a REVIEWER `VISUAL PASS` in `gate_log.csv`. Before signing off DONE, run `node scripts/visual-check/check-visual-evidence.mjs --story <ID> --level 2` and paste its result. Never edit a status with `sed` or another Bash command to get around the hook; CI re-checks every gated UI story.
+
 ## Story Lifecycle
 
 1. **DRAFT** → **READY_FOR_DESIGN** → BA story drafted, owner approves AC (Gate 1), Architect begins design

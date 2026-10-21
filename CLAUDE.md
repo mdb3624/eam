@@ -50,6 +50,10 @@ No direct commits to `main`, ever. Use branch protection on `main` plus a local 
 
 ---
 
+## 👁️ Visual Evidence Gate
+
+A UI story (Scope FULL_STACK or UI_ONLY) cannot move to `CODE_REVIEW` without fresh screenshots captured by `scripts/visual-check/capture.mjs` and actually looked at, and cannot move past `REVIEW_PASSED` without a REVIEWER `VISUAL PASS`. Tests and accessibility snapshots do not count. A hook blocks the status edit; CI re-checks. Details: `docs/standards/Definition_of_Done.md`.
+
 ## ⚖️ Resolved: Autonomy vs. Escalation
 
 **"Don't ask permission" and "don't narrate" apply to chat output, not to the file writes the process requires.** Proceed without asking for in-scope work, report tersely — but still write the CHG-### ticket, the PR note, and the reviewer-gate evidence to their actual files every time the protocol calls for them.

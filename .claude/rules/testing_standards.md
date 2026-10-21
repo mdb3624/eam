@@ -13,6 +13,12 @@
 - **Navigation specs must click through the real UI**, not `page.goto()` straight to the destination — `page.goto()` proves the destination renders, not that the button's click-handler/navigation path works.
 - **A green mocked test suite proves logic, not wiring.** Any new external API key / env-var-backed config property needs, before sign-off: an unmocked call against the real test-environment endpoint with the response pasted in, confirmation the property is declared in every config profile used, and confirmation the env var is passed through every relevant deployment config.
 
+## Visual Evidence (UI stories)
+
+- Real screenshots, viewed, are required before CODE_REVIEW: `scripts/visual-check/capture.mjs`; rules in `docs/standards/Definition_of_Done.md`.
+- Before trusting any logged-in screenshot, confirm the dev server proxy (`VITE_API_URL`) points at the backend the test stack is running on. An all-login-page result means the API calls failed. `expectText` catches this.
+- Check horizontal overflow (`scrollWidth - clientWidth`) at phone width; a clipped form does not show up in the accessibility tree.
+
 ## Selector Strategy
 
 - Every interactive element gets a unique, stable test-id attribute. CSS selectors, XPath, and text-content matching are banned for test selectors — they break on refactor. PRs with new interactive elements and no test-id are rejected at Reviewer gate.

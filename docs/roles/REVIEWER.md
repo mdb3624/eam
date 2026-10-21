@@ -6,7 +6,7 @@
 
 * ❌ **Sequential Lock Protocol Violation:** CODER made backward requests to BA or ARCHITECT (instead of escalating to LIBRARIAN). PR must reference a CHG ticket if inputs were reworked mid-implementation. **Exception:** a documented Fast-Track exchange (cosmetic-only — copy, labels, display formatting — per `CODER.md`) is not a violation, provided LIBRARIAN's `[FAST-TRACK]` traceability entry exists. If the Fast-Track note covers anything structural (AC, schema, compliance, money logic), that IS a violation — REJECT regardless of the inline note.
 * ❌ **Contract Table Violation (if this project uses a Field Contract Table):** Any `UI Field` in the story's Field Contract Table does not have its value rendered from the corresponding `API Param` in the implementation.
-* ❌ **Missing Evidence:** For a UI story, no golden-path test/screenshot artifact exists for the current story.
+* ❌ **Missing or Unviewed Visual Evidence (UI stories):** `docs/project/evidence/<ID>/visual-report.json` is absent, stale (frontend changed after capture), or fails `node scripts/visual-check/check-visual-evidence.mjs --story <ID>`; OR REVIEWER did not open every PNG. Open each screenshot, compare to the HFD design and `docs/standards/style-guide.md`, and check: text overlap, clipping, horizontal overflow, contrast, wrong screen or state, both themes, phone and desktop. Then log a `VISUAL` row in `gate_log.csv` (`PASS`, or `KICK_BACK` with `VISUAL_DEFECT` and the screenshot name). No REVIEWER `VISUAL PASS` means no `REVIEW_PASSED`.
 * ❌ **E2E/Test Failure:** Any required test suite has failures or was skipped.
 * ❌ **Complexity:** CI already auto-rejects (build failure) any method whose complexity/coverage signal exceeds the configured threshold — that's the mechanical floor, not this checklist's bar.
 * ❌ **Test Coverage:** CI already auto-rejects (build failure) below the 65% branch coverage floor. 80% remains the target: treat the range between floor and target as a judgment call (approve with a technical-debt note, or request more tests) rather than an automatic reject.
@@ -82,6 +82,7 @@
 * [ ] **Version Consistency:** New endpoints match the frontend API client's expected base path/version.
 * [ ] **Request Shape:** For every new write endpoint, verify the frontend sends data in the format the backend expects.
 * [ ] **Response Shape:** Every field the frontend renders is actually present in the backend response.
+* [ ] **Visual Evidence:** every screenshot opened and judged; `VISUAL` row logged (see Hard Gates).
 * [ ] **Golden Path Smoke Test:** login → primary feature → adjacent flows → logout all work without network errors in a running browser (not just API calls).
 
 ### Review Verdicts

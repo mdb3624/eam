@@ -25,5 +25,8 @@
 ## RLS Exemption: Session-Token Tables
 Auth-adjacent, non-tenant-scoped session/token tables (e.g. refresh tokens, password-reset tokens) are RLS-exempt by design: no `tenant_id` column, access-controlled by application-layer role checks. Any table with a `tenant_id`, or holding a tenant's business records, still requires RLS without exception.
 
+## One JdbcTemplate, always the runtime role
+Do not expose a `JdbcTemplate`, `NamedParameterJdbcTemplate` or `EntityManager` bean for any pool other than the `eam_runtime` one. A second `JdbcTemplate` bean makes Spring Boot back off its own, and every later `@Autowired JdbcTemplate` silently runs as the pre-auth lookup role, which reads across tenants. Build non-runtime templates inline (`new JdbcTemplate(dataSource)`) inside the one class that needs them. `DataSourceIsolationIT` fails the build if this regresses.
+
 ## Pre-Auth Lookup Role
 `eam_login_lookup` has column-level SELECT on `users(id, tenant_id, email, deleted_at)` and a SELECT-only policy. It exists so login can find a user before any tenant is known. Do not widen its grants without ARCHITECT sign-off.
