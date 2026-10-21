@@ -5,3 +5,4 @@ timestamp,story,gate,actor,verdict,reason_code,detail,outcome
 2026-10-20T00:00:00Z,US-001,HFD_REVIEW,HFD,PASS,,"Field Contract Table clean; style guide v0 awaiting owner sign-off",pending
 2026-10-20T00:00:00Z,US-001,HFD_REVIEW,Mike Barnes,PASS,,"Style guide v1 look approved",pending
 2026-10-20T00:00:00Z,US-001,CODER_DONE,CODER,PASS,,"verify green; 41 FE tests; live smoke passed",pending
+2026-10-20T00:00:00Z,US-001,VISUAL,CODER,PASS,,"10 shots captured and viewed; 2 layout defects fixed earlier; 0 open",pending

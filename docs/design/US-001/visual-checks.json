@@ -1,0 +1,20 @@
+{
+  "_comment": "HFD-authored visual evidence plan for US-001. Run: node scripts/visual-check/capture.mjs --story US-001 --base http://localhost:5273 --token dispatcher=<jwt> --token norole=<jwt>. Login-error and disabled-account banners need form interaction and are covered by App.test.tsx; add them here when capture gains interaction steps.",
+  "themeStorageKey": "eam.theme",
+  "tokenStorageKey": "eam.token",
+  "tokenStorage": "sessionStorage",
+  "loginPath": "/login",
+  "requirements": { "desktopMinWidth": 1024, "mobileMaxWidth": 480, "themes": ["dark", "light"] },
+  "shots": [
+    { "name": "login-desktop-dark", "path": "/login", "width": 1280, "height": 800, "theme": "dark", "expectText": "Sign in" },
+    { "name": "login-desktop-light", "path": "/login", "width": 1280, "height": 800, "theme": "light", "expectText": "Sign in" },
+    { "name": "login-mobile-dark", "path": "/login", "width": 390, "height": 800, "theme": "dark", "expectText": "Sign in" },
+    { "name": "login-mobile-light", "path": "/login", "width": 390, "height": 800, "theme": "light", "expectText": "Sign in" },
+    { "name": "dispatch-desktop-dark", "path": "/dispatch", "width": 1280, "height": 700, "theme": "dark", "token": "dispatcher", "expectText": "Dispatch board" },
+    { "name": "dispatch-desktop-light", "path": "/dispatch", "width": 1280, "height": 700, "theme": "light", "token": "dispatcher", "expectText": "Dispatch board" },
+    { "name": "dispatch-mobile-dark", "path": "/dispatch", "width": 390, "height": 700, "theme": "dark", "token": "dispatcher", "expectText": "Dispatch board" },
+    { "name": "dispatch-mobile-light", "path": "/dispatch", "width": 390, "height": 700, "theme": "light", "token": "dispatcher", "expectText": "Dispatch board" },
+    { "name": "access-denied-wrong-role-desktop-dark", "path": "/alarms", "width": 1280, "height": 700, "theme": "dark", "token": "dispatcher", "expectText": "Go to your home screen" },
+    { "name": "access-denied-no-role-desktop-dark", "path": "/dispatch", "width": 1280, "height": 700, "theme": "dark", "token": "norole", "expectText": "No role assigned" }
+  ]
+}

@@ -212,4 +212,6 @@ docs/standards/style-guide.md
 
 **Visual check (2026-10-20, real screenshots via headless Edge over CDP, test stack backend):** login and shell viewed at 1280px and 390px in dark and light themes, plus Access denied (with role, and no role). Two defects found and fixed: tagline overlapped the power-line art on desktop; login form clipped and heading collided with the logo at 390px (grid min-content overflow). Mobile user card widened to full row. After fixes: 0 horizontal overflow at both widths, layouts match `style-guide-poc.html`. The first pass of this evidence only used the accessibility tree and missed both defects.
 
-**Not done / carried:** REVIEWER audit; LIBRARIAN sign-off; Sprint_Log close-out.
+**Visual evidence (gate-compliant):** 10 screenshots plus `visual-report.json` in `docs/project/evidence/US-001/`, captured by `scripts/visual-check/capture.mjs` against the real test stack (plan: `docs/design/US-001/visual-checks.json`). Both themes, 1280px and 390px, 0 horizontal overflow, every shot found its expected text. A negative run with a bad token failed the expected-text check as intended. `check-visual-evidence.mjs --story US-001` passes level 1; level 2 needs the REVIEWER VISUAL PASS.
+
+**Not done / carried:** REVIEWER audit (including opening every screenshot and logging the VISUAL row); LIBRARIAN sign-off; Sprint_Log close-out.
