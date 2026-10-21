@@ -1,20 +1,24 @@
-// Visual evidence gate: capture real screenshots of a story's UI and write visual-report.json.
+// Visual evidence gate: capture real screenshots of a story's UI with Playwright and write
+// visual-report.json.
 //
 //   node scripts/visual-check/capture.mjs --story US-001 --base http://localhost:5273 \
 //        --token dispatcher=<jwt> --token norole=<jwt>
 //
-// Reads docs/design/<story>/visual-checks.json (authored by HFD), drives a local headless
-// Edge/Chrome over the DevTools protocol (no extra dependencies), and writes the PNGs and
-// docs/project/evidence/<story>/visual-report.json. Screenshots land on the host so they can be
-// opened and looked at; a screenshot tool that saves inside a container is not enough.
+// Reads docs/design/<story>/visual-checks.json (authored by HFD). Playwright is a devDependency of
+// frontend/ and also installed globally (npm install -g playwright). It drives an installed Edge or Chrome (no browser download); if
+// neither exists, run `npx playwright install chromium` in frontend/ and set EAM_BROWSER_CHANNEL=chromium.
+// Screenshots land on the host so they can be opened and looked at.
 //
 // Each shot asserts: no horizontal overflow, and its expectText is on the page. The second one
 // catches the failure that bit US-001: "logged in" shots that were really the login page because
 // the dev proxy pointed at the wrong backend.
-import { spawn } from "node:child_process";
+//
+// A shot may carry "steps" to reach interactive states (error banners etc.):
+//   { "fill": "<data-testid>", "value": "text" }  |  { "click": "<data-testid>" }  |  { "press": "Enter" }
+import { execSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { createRequire } from "node:module";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -36,97 +40,102 @@ if (!existsSync(configPath)) {
   process.exit(2);
 }
 const config = JSON.parse(readFileSync(configPath, "utf8"));
-const outDir = join(root, "docs/project/evidence", story);
-mkdirSync(outDir, { recursive: true });
 
-const browser = [
-  process.env.EAM_BROWSER,
-  "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe",
-  "C:/Program Files/Microsoft/Edge/Application/msedge.exe",
-  "C:/Program Files/Google/Chrome/Application/chrome.exe",
-  "/usr/bin/google-chrome",
-  "/usr/bin/chromium",
-  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-].find((p) => p && existsSync(p));
-if (!browser) {
-  console.error("No Edge/Chrome found. Set EAM_BROWSER to a Chromium-based browser executable.");
+// Resolve Playwright from the project first, then from the global npm install, so the capture
+// works in any checkout on this machine (npm install -g playwright).
+let chromium;
+const resolvers = [
+  () => createRequire(join(root, "frontend", "package.json"))("playwright"),
+  () => createRequire(join(execSync("npm root -g", { encoding: "utf8" }).trim(), "x.js"))("playwright"),
+];
+for (const resolveIt of resolvers) {
+  try {
+    ({ chromium } = resolveIt());
+    break;
+  } catch {
+    // try the next location
+  }
+}
+if (!chromium) {
+  console.error("Playwright is not installed. Run: npm install -g playwright   (or: cd frontend && npm install)");
   process.exit(2);
 }
 
-const port = 9300 + Math.floor(Math.random() * 500);
-const profile = mkdtempSync(join(tmpdir(), "eam-capture-"));
-const proc = spawn(browser, ["--headless=new", "--disable-gpu", `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, "about:blank"], {
-  stdio: "ignore",
-});
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-
-async function pageTarget() {
-  for (let i = 0; i < 40; i++) {
+async function launch() {
+  const channels = process.env.EAM_BROWSER_CHANNEL ? [process.env.EAM_BROWSER_CHANNEL] : ["msedge", "chrome", "chromium"];
+  const errors = [];
+  for (const channel of channels) {
     try {
-      const targets = await (await fetch(`http://127.0.0.1:${port}/json`)).json();
-      const page = targets.find((t) => t.type === "page");
-      if (page) return page;
-    } catch {
-      // browser still starting
+      return await chromium.launch(channel === "chromium" ? {} : { channel });
+    } catch (e) {
+      errors.push(`${channel}: ${String(e.message).split("\n")[0]}`);
     }
-    await sleep(250);
   }
-  throw new Error("browser did not start");
+  console.error(`Could not launch a browser.\n  ${errors.join("\n  ")}\nInstall one: cd frontend && npx playwright install chromium (then EAM_BROWSER_CHANNEL=chromium).`);
+  process.exit(2);
 }
 
-const target = await pageTarget();
-const ws = new WebSocket(target.webSocketDebuggerUrl);
-await new Promise((r) => (ws.onopen = r));
-let nextId = 0;
-const pending = new Map();
-ws.onmessage = (m) => {
-  const d = JSON.parse(m.data);
-  if (d.id && pending.has(d.id)) {
-    pending.get(d.id)(d.result ?? d.error);
-    pending.delete(d.id);
-  }
-};
-const send = (method, params = {}) =>
-  new Promise((resolveCall) => {
-    const id = ++nextId;
-    pending.set(id, resolveCall);
-    ws.send(JSON.stringify({ id, method, params }));
-  });
-const evaluate = async (expression) => (await send("Runtime.evaluate", { expression, returnByValue: true })).result?.value;
+// Start from a clean evidence folder so a stale file from an earlier or interrupted run can never
+// be mixed into this report.
+const outDir = join(root, "docs/project/evidence", story);
+mkdirSync(outDir, { recursive: true });
+for (const f of readdirSync(outDir)) {
+  if (f.endsWith(".png") || f === "visual-report.json") rmSync(join(outDir, f));
+}
 
 const origin = new URL(base).origin;
 const tokenStore = config.tokenStorage ?? "sessionStorage";
-const report = { story, generatedAt: null, base, browser, shots: [] };
+const browser = await launch();
+const report = { story, generatedAt: null, base, browser: `${browser.browserType().name()} ${browser.version()}`, tool: "playwright", shots: [] };
 let failed = false;
 
 for (const shot of config.shots) {
-  await send("Emulation.setDeviceMetricsOverride", { width: shot.width, height: shot.height, deviceScaleFactor: 1, mobile: shot.width < 600 });
-  await send("Page.navigate", { url: origin + (config.loginPath ?? "/login") });
-  await sleep(1200);
-  await evaluate("sessionStorage.clear(); localStorage.clear();");
+  const context = await browser.newContext({
+    viewport: { width: shot.width, height: shot.height },
+    isMobile: shot.width < 600,
+    hasTouch: shot.width < 600,
+    deviceScaleFactor: 1,
+  });
+  const page = await context.newPage();
+  const problems = [];
+  page.on("pageerror", (e) => problems.push(`page error: ${e.message}`));
+
+  // Seed theme and session before any app script runs.
   if (shot.theme && config.themeStorageKey) {
-    await evaluate(`localStorage.setItem(${JSON.stringify(config.themeStorageKey)}, ${JSON.stringify(shot.theme)})`);
+    await context.addInitScript(([k, v]) => localStorage.setItem(k, v), [config.themeStorageKey, shot.theme]);
   }
   if (shot.token) {
     if (!tokens[shot.token]) {
       console.error(`Shot ${shot.name} needs --token ${shot.token}=<jwt>`);
       failed = true;
+      await context.close();
       continue;
     }
-    await evaluate(`${tokenStore}.setItem(${JSON.stringify(config.tokenStorageKey)}, ${JSON.stringify(tokens[shot.token])})`);
+    await context.addInitScript(
+      ([store, k, v]) => window[store].setItem(k, v),
+      [tokenStore, config.tokenStorageKey, tokens[shot.token]],
+    );
   }
-  await send("Page.navigate", { url: origin + shot.path });
 
-  let found = false;
-  for (let i = 0; i < 32 && !found; i++) {
-    await sleep(250);
-    found = await evaluate(`document.body && document.body.innerText.includes(${JSON.stringify(shot.expectText)})`);
+  await page.goto(origin + shot.path, { waitUntil: "load" });
+  for (const step of shot.steps ?? []) {
+    if (step.fill !== undefined) await page.getByTestId(step.fill).fill(step.value ?? "");
+    else if (step.click !== undefined) await page.getByTestId(step.click).click();
+    else if (step.press !== undefined) await page.keyboard.press(step.press);
   }
-  await sleep(300);
-  const overflowPx = await evaluate("document.documentElement.scrollWidth - document.documentElement.clientWidth");
-  const png = Buffer.from((await send("Page.captureScreenshot", { format: "png" })).data, "base64");
+
+  let found = true;
+  try {
+    await page.waitForFunction((text) => document.body && document.body.innerText.includes(text), shot.expectText, { timeout: 8000 });
+  } catch {
+    found = false;
+  }
+  await page.waitForTimeout(300);
+  const overflowPx = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   const file = `${shot.name}.png`;
-  writeFileSync(join(outDir, file), png);
+  const png = await page.screenshot({ path: join(outDir, file), fullPage: false });
+  await context.close();
+
   const entry = {
     name: shot.name,
     file,
@@ -137,24 +146,19 @@ for (const shot of config.shots) {
     theme: shot.theme ?? null,
     path: shot.path,
     expectText: shot.expectText,
-    expectTextFound: Boolean(found),
+    expectTextFound: found,
     overflowPx,
   };
+  if (problems.length) entry.pageErrors = problems;
   report.shots.push(entry);
-  const ok = entry.expectTextFound && overflowPx === 0;
+  const ok = found && overflowPx === 0 && problems.length === 0;
   failed ||= !ok;
-  console.log(`${ok ? "ok  " : "FAIL"} ${shot.name} (${shot.width}px ${shot.theme ?? ""}) overflow=${overflowPx} text=${entry.expectTextFound ? "found" : "NOT FOUND"}`);
+  console.log(`${ok ? "ok  " : "FAIL"} ${shot.name} (${shot.width}px ${shot.theme ?? ""}) overflow=${overflowPx} text=${found ? "found" : "NOT FOUND"}${problems.length ? ` ${problems[0]}` : ""}`);
 }
 
+await browser.close();
 report.generatedAt = new Date().toISOString().replace(/\.\d+Z$/, "Z");
 writeFileSync(join(outDir, "visual-report.json"), JSON.stringify(report, null, 2) + "\n");
-ws.close();
-proc.kill();
-try {
-  rmSync(profile, { recursive: true, force: true });
-} catch {
-  // profile dir may still be locked by the exiting browser; it is in the OS temp dir
-}
 console.log(`\nWrote ${report.shots.length} screenshots and visual-report.json to ${outDir}`);
 console.log("Next: OPEN EVERY PNG and look at it (layout, overlap, clipping, contrast). A passing report is not a review.");
 process.exit(failed ? 1 : 0);
