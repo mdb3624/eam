@@ -210,4 +210,6 @@ docs/standards/style-guide.md
 
 **Defect found and fixed during build:** exposing a second `JdbcTemplate` bean for the lookup pool made `RlsCanaryIT` see all tenants (the auto-configured runtime template backed off). Removed the bean; recorded in ARCHITECTURE.md.
 
-**Not done / carried:** visual parity check against `style-guide-poc.html` was by accessibility tree only (screenshots were not viewable); REVIEWER audit; LIBRARIAN sign-off; Sprint_Log close-out.
+**Visual check (2026-10-20, real screenshots via headless Edge over CDP, test stack backend):** login and shell viewed at 1280px and 390px in dark and light themes, plus Access denied (with role, and no role). Two defects found and fixed: tagline overlapped the power-line art on desktop; login form clipped and heading collided with the logo at 390px (grid min-content overflow). Mobile user card widened to full row. After fixes: 0 horizontal overflow at both widths, layouts match `style-guide-poc.html`. The first pass of this evidence only used the accessibility tree and missed both defects.
+
+**Not done / carried:** REVIEWER audit; LIBRARIAN sign-off; Sprint_Log close-out.

@@ -268,13 +268,14 @@ input[aria-invalid='true'] {
 .login-page {
   min-height: 100vh;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   place-items: center;
   padding: var(--s4);
 }
 
 .login {
   display: grid;
-  grid-template-columns: 1.1fr 1fr;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
   width: 100%;
   max-width: 880px;
   border: 1px solid var(--border);
@@ -302,6 +303,7 @@ input[aria-invalid='true'] {
 
 .brand-copy {
   position: relative;
+  margin-bottom: 120px;
 }
 
 .brand-copy h2 {
@@ -317,7 +319,8 @@ input[aria-invalid='true'] {
   position: absolute;
   inset: auto 0 0 0;
   width: 100%;
-  height: 55%;
+  height: 110px;
+  opacity: 0.8;
 }
 
 .formpane {
@@ -359,14 +362,24 @@ input[aria-invalid='true'] {
 
   .me {
     margin-top: 0;
+    flex: 1 1 100%;
   }
 
   .login {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .brandpane {
-    min-height: 190px;
+    min-height: 0;
+    gap: var(--s6);
+    padding: var(--s6) var(--s6) 150px;
+  }
+
+  .brand-copy {
+    margin-bottom: 0;
+  }
+
+  .formpane {
     padding: var(--s6);
   }
 }
