@@ -6,7 +6,7 @@ Source: `docs/requirements/` (BRD v1.0, MVP Scope and Delivery Baseline, MVP Sco
 
 | Story ID | Title | Epic | Actor | Scope | Status |
 |---|---|---|---|---|---|
-| US-001 | User Login and Role-Based Access | EPIC-01 Platform Foundation | All personas | FULL_STACK | REVIEW_PASSED |
+| US-001 | User Login and Role-Based Access | EPIC-01 Platform Foundation | All personas | FULL_STACK | DONE |
 | US-002 | Canonical Asset Record and Search | EPIC-01 Platform Foundation | Maria Alvarez | FULL_STACK | READY_FOR_DESIGN |
 | US-003 | Audit Trail for Record and Privileged Actions | EPIC-01 Platform Foundation | Sam Whitfield | FULL_STACK | DRAFT |
 | US-004 | Ingest and Retain Raw Source Event | EPIC-02 Integration & Events | Sam Whitfield | FULL_STACK | DRAFT |
