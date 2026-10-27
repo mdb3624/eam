@@ -47,4 +47,4 @@ Scenario: Work list is scoped to the technician's own assignments
 **BA sign-off:** [x] Mike Barnes — pending story-owner approval of ACs
 
 ## Decision Log
-- Target mobile platform(s) is an open decision per `MVP_Scope_Definition.docx` §11 — not yet resolved.
+- Target mobile platform(s) is an open decision per `MVP_Scope_Definition.md` §11 — not yet resolved.

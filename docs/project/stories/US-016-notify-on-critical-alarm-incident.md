@@ -42,4 +42,4 @@ Scenario: Notification delivery status is recorded
 **BA sign-off:** [x] Mike Barnes — pending story-owner approval of ACs
 
 ## Decision Log
-- Notification channel (email vs. SMS) is an open decision per `MVP_Scope_Definition.docx` §11 — not yet resolved.
+- Notification channel (email vs. SMS) is an open decision per `MVP_Scope_Definition.md` §11 — not yet resolved.

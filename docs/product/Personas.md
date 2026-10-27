@@ -1,6 +1,6 @@
 # Personas — Utility Asset & Field Operations Platform (MVP)
 
-Source: `docs/requirements/Utility_Asset_Field_Operations_Platform_Business_Requirements_v1.docx` (§5 Business Users & Roles, Table 1) and `docs/requirements/MVP_Scope_Definition.docx` (§6 MVP Roles). Narrowed to the five roles carried into MVP scope — Engineer, Inventory Manager, Procurement User and Executive are deferred with the capabilities that serve them.
+Source: `docs/requirements/Utility_Asset_Field_Operations_Platform_Business_Requirements_v1.md` (§5 Business Users & Roles, Table 1) and `docs/requirements/MVP_Scope_Definition.md` (§6 MVP Roles). Narrowed to the five roles carried into MVP scope — Engineer, Inventory Manager, Procurement User and Executive are deferred with the capabilities that serve them.
 
 ---
 
@@ -79,4 +79,4 @@ Source: `docs/requirements/Utility_Asset_Field_Operations_Platform_Business_Requ
 
 ---
 
-**Deferred personas (post-MVP, per `MVP_Scope_Definition.docx` §6):** Engineer, Inventory Manager, Procurement User, Manager/Executive.
+**Deferred personas (post-MVP, per `MVP_Scope_Definition.md` §6):** Engineer, Inventory Manager, Procurement User, Manager/Executive.

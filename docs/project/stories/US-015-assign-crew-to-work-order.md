@@ -38,7 +38,7 @@ Scenario: Reassignment is supported
 - [x] Negotiable
 - [x] Valuable — implements BRD §18 rule: "IF work order requires a skill → only qualified crews may be assigned."
 - [x] Estimable
-- [x] Small — manual assignment only; GPS-optimized auto-dispatch is explicitly deferred (`MVP_Scope_Definition.docx` §4).
+- [x] Small — manual assignment only; GPS-optimized auto-dispatch is explicitly deferred (`MVP_Scope_Definition.md` §4).
 - [x] Testable
 
 ## Field Contract Table

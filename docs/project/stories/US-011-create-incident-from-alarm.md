@@ -51,4 +51,4 @@ Scenario: Incident carries required fields
 **BA sign-off:** [x] Mike Barnes — pending story-owner approval of ACs
 
 ## Decision Log
-- Incident-creation rule specifics are an open decision per `MVP_Scope_Definition.docx` §11 ("one configured priority rule to flag an incident as emergency"). This story is written rule-agnostic pending that decision.
+- Incident-creation rule specifics are an open decision per `MVP_Scope_Definition.md` §11 ("one configured priority rule to flag an incident as emergency"). This story is written rule-agnostic pending that decision.

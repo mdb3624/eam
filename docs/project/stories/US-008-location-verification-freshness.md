@@ -27,7 +27,7 @@ Scenario: Stale location is flagged
 ## INVEST Self-Check
 - [x] Independent
 - [x] Negotiable
-- [x] Valuable — directly supports MVP Definition of Done: "GIS unavailable/stale... clearly display freshness/status" (`Business_Requirements_v1.docx` Table 4).
+- [x] Valuable — directly supports MVP Definition of Done: "GIS unavailable/stale... clearly display freshness/status" (`Business_Requirements_v1.md` Table 4).
 - [x] Estimable
 - [x] Small
 - [x] Testable

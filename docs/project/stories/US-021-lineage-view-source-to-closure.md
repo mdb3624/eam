@@ -32,7 +32,7 @@ Scenario: Lineage view surfaces a reconciliation step if one occurred
 ## INVEST Self-Check
 - [x] Independent
 - [x] Negotiable
-- [x] Valuable — this is explicitly named the MVP's "proof point for the platform's differentiator" (`MVP_Scope_Definition.docx` §3.5) and a named success metric ("percentage of work orders closed with complete lineage... with no gaps," §10).
+- [x] Valuable — this is explicitly named the MVP's "proof point for the platform's differentiator" (`MVP_Scope_Definition.md` §3.5) and a named success metric ("percentage of work orders closed with complete lineage... with no gaps," §10).
 - [x] Estimable
 - [x] Small — single lineage view only; full BRD §8.5 lineage viewer/dashboard is explicitly deferred.
 - [x] Testable
