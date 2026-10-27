@@ -2,7 +2,7 @@
 
 **Epic:** EPIC-01 Platform Foundation
 **Actor:** All MVP personas (Maria, Dwayne, Jess, Priya, Sam) — administered by Sam Whitfield, System Administrator
-**Status:** CODE_REVIEW (implementation complete 2026-10-20, awaiting REVIEWER and LIBRARIAN)
+**Status:** REVIEW_PASSED (REVIEWER PASS and VISUAL PASS 2026-10-27, CI green; awaiting PR merge and LIBRARIAN DONE sign-off)
 **Scope:** FULL_STACK
 
 ## User Story
@@ -215,3 +215,10 @@ docs/standards/style-guide.md
 **Visual evidence (gate-compliant):** 14 screenshots (Playwright; includes wrong-password, disabled-account and invalid-email states on desktop and phone, all viewed) plus `visual-report.json` in `docs/project/evidence/US-001/`, captured by `scripts/visual-check/capture.mjs` against the real test stack (plan: `docs/design/US-001/visual-checks.json`). Both themes, 1280px and 390px, 0 horizontal overflow, every shot found its expected text. A negative run with a bad token failed the expected-text check as intended. `check-visual-evidence.mjs --story US-001` passes level 1; level 2 needs the REVIEWER VISUAL PASS.
 
 **Not done / carried:** REVIEWER audit (including opening every screenshot and logging the VISUAL row); LIBRARIAN sign-off; Sprint_Log close-out.
+
+## Reviewer and Librarian Notes (2026-10-27)
+
+- REVIEWER: KICK_BACK (CI not verifiable) then PASS after CI run 40553689502 went green. VISUAL PASS, 14 shots. See `docs/project/gate_log.csv`.
+- AC 1, 2, 3 and the disabled-account edge case pass. The session-expiry edge case is partial: the "without losing unsaved field-form data" clause is not implemented. Carried to US-019.
+- Scope drift recorded in `Sprint_Log.md` (2026-10-27). Owner to choose scope amendment or INF ticket.
+- Debt: frontend coverage unmeasured (`@vitest/coverage-v8` missing); no session-expired screenshot; scope-guard hook wrote no `CODER_SCOPE` rows for out-of-scope files.
