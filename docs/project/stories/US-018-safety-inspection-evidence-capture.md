@@ -37,7 +37,7 @@ Scenario: Work cannot be marked complete without required evidence
 ## INVEST Self-Check
 - [x] Independent
 - [x] Negotiable
-- [x] Valuable — MVP explicitly scopes formal LOTO/permit workflow out (`MVP_Scope_Definition.docx` §4) in favor of a free-text safety note, which this story implements.
+- [x] Valuable — MVP explicitly scopes formal LOTO/permit workflow out (`MVP_Scope_Definition.md` §4) in favor of a free-text safety note, which this story implements.
 - [x] Estimable
 - [x] Small — one configurable inspection form per MVP boundary.
 - [x] Testable

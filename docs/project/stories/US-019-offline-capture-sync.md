@@ -32,7 +32,7 @@ Scenario: Sync conflict is visibly flagged
 ## INVEST Self-Check
 - [x] Independent
 - [x] Negotiable
-- [x] Valuable — MVP explicitly requires this: "basic offline cache of assigned work... conflict handling limited to last-write-wins plus a visible warning" (`MVP_Scope_Definition.docx` §3.4).
+- [x] Valuable — MVP explicitly requires this: "basic offline cache of assigned work... conflict handling limited to last-write-wins plus a visible warning" (`MVP_Scope_Definition.md` §3.4).
 - [x] Estimable
 - [x] Small
 - [x] Testable

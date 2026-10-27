@@ -35,7 +35,7 @@ Scenario: Operator sees the alarm on the console immediately
 - [x] Negotiable
 - [x] Valuable — directly implements BRD §18 business rule: "IF critical internal-fault event is received AND asset identity is verified → create critical alarm and incident."
 - [x] Estimable
-- [x] Small — one configured severity rule per MVP boundary (`MVP_Scope_Definition.docx` §3.3).
+- [x] Small — one configured severity rule per MVP boundary (`MVP_Scope_Definition.md` §3.3).
 - [x] Testable
 
 ## Field Contract Table
@@ -48,4 +48,4 @@ Scenario: Operator sees the alarm on the console immediately
 **BA sign-off:** [x] Mike Barnes — pending story-owner approval of ACs
 
 ## Decision Log
-- Initial event types and severity rule are an open decision per `Business_Requirements_v1.docx` §29 — this story assumes at least one critical-fault rule is configured before build; exact rule content is an ARCH/BA follow-up once the pilot source system is confirmed.
+- Initial event types and severity rule are an open decision per `Business_Requirements_v1.md` §29 — this story assumes at least one critical-fault rule is configured before build; exact rule content is an ARCH/BA follow-up once the pilot source system is confirmed.

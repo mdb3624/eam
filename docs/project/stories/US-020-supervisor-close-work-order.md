@@ -32,7 +32,7 @@ Scenario: Closure is blocked without required evidence
 ## INVEST Self-Check
 - [x] Independent
 - [x] Negotiable
-- [x] Valuable — directly implements MVP Definition of Done: "closure updates asset history" (`MVP_Scope_Definition.docx` §9).
+- [x] Valuable — directly implements MVP Definition of Done: "closure updates asset history" (`MVP_Scope_Definition.md` §9).
 - [x] Estimable
 - [x] Small
 - [x] Testable

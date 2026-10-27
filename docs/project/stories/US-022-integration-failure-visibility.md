@@ -32,7 +32,7 @@ Scenario: Degraded state does not imply asset normalcy
 ## INVEST Self-Check
 - [x] Independent
 - [x] Negotiable
-- [x] Valuable — directly implements MVP Definition of Done: "integration failure... never silently implies a normal/healthy asset state" (`MVP_Scope_Definition.docx` §9) and BRD Table 4 failure-mode requirements.
+- [x] Valuable — directly implements MVP Definition of Done: "integration failure... never silently implies a normal/healthy asset state" (`MVP_Scope_Definition.md` §9) and BRD Table 4 failure-mode requirements.
 - [x] Estimable
 - [x] Small
 - [x] Testable
