@@ -52,17 +52,23 @@ if [ -z "$doc" ]; then
 fi
 [ -z "$doc" ] || [ ! -f "$doc" ] && { echo '{}'; exit 0; }
 
-# Collect the scope list: "- " lines under "## Files in Scope" until the next "## ".
+# Collect the scope list: one path or glob per line under "## Files in Scope" until
+# the next "## ". ARCHITECT.md says bare lines; "- " bullets and backticks are also
+# accepted. Blank lines, code fences, comments and prose (anything with a space) are skipped.
 scope=$(awk '
   /^## Files in Scope/ {on=1; next}
   /^## / {on=0}
-  on && /^- / {sub(/^- +/, ""); gsub(/`/, ""); print}
-' "$doc" | grep -v '\[' | sed -E 's/[[:space:]]+$//')
+  on {
+    sub(/^[-*][ \t]+/, ""); gsub(/`/, ""); gsub(/\r/, "")
+    sub(/^[ \t]+/, ""); sub(/[ \t]+$/, "")
+    if ($0 != "" && $0 !~ /^[#>]/ && $0 !~ /[ \t]/) print
+  }
+' "$doc" | grep -v '\[')
 [ -z "$scope" ] && { echo '{}'; exit 0; }
 
 # Always-allowed bookkeeping files.
 case "$rel" in
-  docs/business/stories/${story}*|docs/project/stories/${story}*|docs/changes/${story}*|docs/project/Story_Map.md|docs/project/gate_log.csv|test-results/*)
+  docs/business/stories/${story}*|docs/project/stories/${story}*|docs/changes/${story}*|docs/project/evidence/${story}/*|docs/project/Story_Map.md|docs/project/gate_log.csv|test-results/*)
     echo '{}'; exit 0 ;;
 esac
 
