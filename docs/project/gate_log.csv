@@ -1,0 +1,11 @@
+timestamp,story,gate,actor,verdict,reason_code,detail,outcome
+2026-10-20T00:00:00Z,US-001,BA_GATE1,Mike Barnes,PASS,,"ACs approved as written",pending
+2026-10-20T00:00:00Z,US-002,BA_GATE1,Mike Barnes,PASS,,"ACs approved as written",pending
+2026-10-20T00:00:00Z,US-001,ARCH_ACCEPT,ARCHITECT,PASS,,"Design complete, no lookup grant widening",pending
+2026-10-20T00:00:00Z,US-001,HFD_REVIEW,HFD,PASS,,"Field Contract Table clean; style guide v0 awaiting owner sign-off",pending
+2026-10-20T00:00:00Z,US-001,HFD_REVIEW,Mike Barnes,PASS,,"Style guide v1 look approved",pending
+2026-10-20T00:00:00Z,US-001,CODER_DONE,CODER,PASS,,"verify green; 41 FE tests; live smoke passed",pending
+2026-10-20T00:00:00Z,US-001,VISUAL,CODER,PASS,,"10 shots captured and viewed; 2 layout defects fixed earlier; 0 open",pending
+2026-10-27T17:01:00Z,US-001,REVIEWER,REVIEWER,KICK_BACK,OTHER,"Code/ACs/security pass and full suites green (BE 34 unit + 31 IT, branch 92.9%; FE 41), but CI not verifiable: branch has no remote and no CI run (hard gate). Also DRIFT: DataSourceIsolationIT and visual-check harness outside Files in Scope",pending
+2026-10-27T17:01:00Z,US-001,VISUAL,REVIEWER,PASS,,"All 14 shots opened; both themes, 1280 and 390 widths, error/invalid/disabled/access-denied states; no overlap, clipping or overflow; evidence newer than last frontend change",pending
+2026-10-27T18:14:00Z,US-001,REVIEWER,REVIEWER,PASS,,"CI green on pushed branch (run 40553689502: Visual Evidence Gate, Backend, Frontend all success); converts the earlier CI-not-verified KICK_BACK per reviewer's stated condition, no code change. Logged via sprint-run on owner go",pending

@@ -1,0 +1,187 @@
+{
+  "_comment": "HFD-authored visual evidence plan for US-001. Run: node scripts/visual-check/capture.mjs --story US-001 --base http://localhost:5273 --token dispatcher=<jwt> --token norole=<jwt>. Interactive states use steps (fill/click by data-testid).",
+  "themeStorageKey": "eam.theme",
+  "tokenStorageKey": "eam.token",
+  "tokenStorage": "sessionStorage",
+  "loginPath": "/login",
+  "requirements": {
+    "desktopMinWidth": 1024,
+    "mobileMaxWidth": 480,
+    "themes": [
+      "dark",
+      "light"
+    ]
+  },
+  "shots": [
+    {
+      "name": "login-desktop-dark",
+      "path": "/login",
+      "width": 1280,
+      "height": 800,
+      "theme": "dark",
+      "expectText": "Sign in"
+    },
+    {
+      "name": "login-desktop-light",
+      "path": "/login",
+      "width": 1280,
+      "height": 800,
+      "theme": "light",
+      "expectText": "Sign in"
+    },
+    {
+      "name": "login-mobile-dark",
+      "path": "/login",
+      "width": 390,
+      "height": 800,
+      "theme": "dark",
+      "expectText": "Sign in"
+    },
+    {
+      "name": "login-mobile-light",
+      "path": "/login",
+      "width": 390,
+      "height": 800,
+      "theme": "light",
+      "expectText": "Sign in"
+    },
+    {
+      "name": "dispatch-desktop-dark",
+      "path": "/dispatch",
+      "width": 1280,
+      "height": 700,
+      "theme": "dark",
+      "token": "dispatcher",
+      "expectText": "Dispatch board"
+    },
+    {
+      "name": "dispatch-desktop-light",
+      "path": "/dispatch",
+      "width": 1280,
+      "height": 700,
+      "theme": "light",
+      "token": "dispatcher",
+      "expectText": "Dispatch board"
+    },
+    {
+      "name": "dispatch-mobile-dark",
+      "path": "/dispatch",
+      "width": 390,
+      "height": 700,
+      "theme": "dark",
+      "token": "dispatcher",
+      "expectText": "Dispatch board"
+    },
+    {
+      "name": "dispatch-mobile-light",
+      "path": "/dispatch",
+      "width": 390,
+      "height": 700,
+      "theme": "light",
+      "token": "dispatcher",
+      "expectText": "Dispatch board"
+    },
+    {
+      "name": "access-denied-wrong-role-desktop-dark",
+      "path": "/alarms",
+      "width": 1280,
+      "height": 700,
+      "theme": "dark",
+      "token": "dispatcher",
+      "expectText": "Go to your home screen"
+    },
+    {
+      "name": "access-denied-no-role-desktop-dark",
+      "path": "/dispatch",
+      "width": 1280,
+      "height": 700,
+      "theme": "dark",
+      "token": "norole",
+      "expectText": "No role assigned"
+    },
+    {
+      "name": "login-error-wrong-password-desktop-dark",
+      "path": "/login",
+      "width": 1280,
+      "height": 800,
+      "theme": "dark",
+      "expectText": "Invalid email or password.",
+      "steps": [
+        {
+          "fill": "login-email",
+          "value": "dwayne@metro.test"
+        },
+        {
+          "fill": "login-password",
+          "value": "wrong-password"
+        },
+        {
+          "click": "login-submit"
+        }
+      ]
+    },
+    {
+      "name": "login-error-wrong-password-mobile-dark",
+      "path": "/login",
+      "width": 390,
+      "height": 800,
+      "theme": "dark",
+      "expectText": "Invalid email or password.",
+      "steps": [
+        {
+          "fill": "login-email",
+          "value": "dwayne@metro.test"
+        },
+        {
+          "fill": "login-password",
+          "value": "wrong-password"
+        },
+        {
+          "click": "login-submit"
+        }
+      ]
+    },
+    {
+      "name": "login-error-disabled-desktop-dark",
+      "path": "/login",
+      "width": 1280,
+      "height": 800,
+      "theme": "dark",
+      "expectText": "This account is disabled. Contact your administrator.",
+      "steps": [
+        {
+          "fill": "login-email",
+          "value": "disabled@metro.test"
+        },
+        {
+          "fill": "login-password",
+          "value": "Smoke-Test-1"
+        },
+        {
+          "click": "login-submit"
+        }
+      ]
+    },
+    {
+      "name": "login-invalid-email-desktop-dark",
+      "path": "/login",
+      "width": 1280,
+      "height": 800,
+      "theme": "dark",
+      "expectText": "Enter a valid email address.",
+      "steps": [
+        {
+          "fill": "login-email",
+          "value": "maria@"
+        },
+        {
+          "fill": "login-password",
+          "value": "x"
+        },
+        {
+          "click": "login-submit"
+        }
+      ]
+    }
+  ]
+}

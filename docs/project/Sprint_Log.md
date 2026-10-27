@@ -19,3 +19,21 @@ Owned by LIBRARIAN. Append-only decision/status log.
 - **Boundary (non-negotiable):** Fast-Track never applies to AC pass/fail criteria, schema/contract shape, or business/compliance/money logic. Anything in that category is a CHG-### escalation to LIBRARIAN as before — a Fast-Track note covering a structural issue is a Sequential Lock violation, not a valid exception, and REVIEWER must reject it regardless of the inline note.
 - **Traceability requirement:** Every Fast-Track use must produce a `[FAST-TRACK]` entry in the Technical Debt Ledger (or the story's own file) — LIBRARIAN logs this even when no CHG-### ticket exists, so the decision remains auditable.
 - **Reference:** `docs/project/RACI_Design_Flow.md` reflects this pattern in its Fast-Track rows for BA, ARCHITECT, HFD, and CODER.
+
+## 2026-10-20 — Gate 1: US-001 and US-002 ACs Approved
+
+- **Action:** Story owner (Mike Barnes) approved the ACs of US-001 and US-002 as written. Both move DRAFT → READY_FOR_DESIGN.
+- **Build order decision:** US-001 first, then US-002. US-002 needs a tenant bound to web requests, which only US-001 provides.
+- **US-001 scoping decisions:** stateless JWT access token (no refresh tokens yet); email is globally unique, so login finds the tenant from the email via `eam_login_lookup`; users are created by seed/test fixtures only (no admin create-user endpoint, to be storied later).
+- **US-002 scoping decisions:** assets modeled as one self-referencing table (`asset_type` + `parent_id`) covering substation, feeder and transformer; the tenant is the utility, so no utility row; FULL_STACK, HFD included.
+- **Branching:** scaffold is not on `main` yet; feature branches are cut from `chore/story-scope-guard-and-sprint-backlog`, which sits on `chore/quality-gates`.
+
+## 2026-10-27 — US-001 REVIEW_PASSED
+
+- **Action:** REVIEWER audited US-001 in a separate session. First verdict KICK_BACK (`OTHER`): the branch was not on origin, so CI could not be verified. Branch pushed; CI run 40553689502 green (Visual Evidence Gate, Backend build and verify, Frontend lint/test/build). REVIEWER PASS and VISUAL PASS are both in `gate_log.csv`. US-001 moves CODE_REVIEW → REVIEW_PASSED.
+- **Evidence:** backend 34 unit + 31 integration, 0 failures, branch coverage about 92.9% (floor 65%, target 80%); frontend 41 tests, lint clean; all 14 screenshots opened.
+- **Not yet DONE:** DONE needs the PR merged (merge state to be verified, not assumed), the Librarian Sign-Off section, and `check-visual-evidence.mjs --story US-001 --level 2` pasted in.
+- **Carried to US-019 (BA to add at its Gate 1):** "no loss of unsaved form data on session expiry". No forms exist yet, so nothing to fix in US-001.
+- **Open, owner decision:** scope drift. Files changed after the story's scope guard that are not in Files in Scope: `DataSourceIsolationIT`, `scripts/visual-check/*`, `.claude/hooks/visual-evidence-guard.sh`, `.claude/settings.json`, `.claude/rules/*`, root `CLAUDE.md`, `docs/roles/*`, `docs/standards/*`, the US-002 story doc, and US-001 evidence files. Mostly harness and governance work. Options: amend the story's Files in Scope, or file an INF ticket.
+- **Debt:** frontend coverage tool (`@vitest/coverage-v8`) not installed, so frontend coverage is unmeasured. No screenshot of the session-expired banner. Scope-guard hook wrote no `CODER_SCOPE` rows for the out-of-scope files; check the hook.
+- **Known and documented:** a disabled user keeps a valid token until expiry; no rate limiting.

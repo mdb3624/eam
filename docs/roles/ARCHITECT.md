@@ -72,7 +72,8 @@ After accepting a story, ARCH must fill the Field Contract Table before handing 
 
 1. For each row BA populated with a `UI Field`, fill: `API Param`, `DB Column`, `Type`, `Required`.
 2. Add rows for API params or DB columns that have **no UI field** (backend-only data) — set `UI Field` = N/A with justification.
-3. Check the ARCH sign-off box before handing off.
+3. **Declare Files in Scope** (added 2026-10-12) — fill the story's `## Files in Scope` section with one path or glob per line, relative to the repo root, covering every production and test file the CODER is expected to touch. The scope-guard hook (`.claude/hooks/story-scope-guard.sh`) reads this list and flags any edit outside it. Update the list if the design changes; an edit the CODER legitimately needs outside the list goes through a scope amendment here, not a silent edit.
+4. Check the ARCH sign-off box before handing off.
 
 **Rejection rule:** If BA's `UI Field` column is empty or contains placeholder text, REJECT the story back to BA before filling any columns.
 
@@ -85,7 +86,8 @@ When handing off to CODER:
 2. Entity relationship diagram
 3. Domain model (class diagram with constraints)
 4. Validation rules per entity
-5. Soft-delete / multi-tenancy notes, if applicable to this project
+5. Soft-delete and multi-tenancy notes (this project is multi-tenant: RLS policy per tenant-owned table, per `.claude/rules/postgres-native.md`)
+6. Flyway migration plan: filename(s) per `database-migrations.md` and the grants each new table needs
 
 ---
 

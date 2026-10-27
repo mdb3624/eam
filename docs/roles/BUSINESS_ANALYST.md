@@ -18,7 +18,11 @@
 
 1. **Set the Scope flag** — `FULL_STACK`, `UI_ONLY`, or `BACKEND_ONLY`.
 2. **Populate the `UI Field` column** — list every field, button, badge, or display value the user will interact with. Leave `API Param`, `DB Column`, `Type`, `Required` blank for ARCH to fill.
-3. Check the BA sign-off box before setting story status to `READY_FOR_DESIGN`.
+3. **Set the Size and Risk tags** (added 2026-10-12) — two header fields on every story, set from the ACs and the business impact, never from how it will be built:
+   - **Size:** `S` (3 or fewer ACs, one persona, one screen or one endpoint), `M` (4 to 7 ACs, or two personas), `L` (more than 7 ACs, or crosses personas and backend). An `L` must carry a one-line note on why it can't be split — the INVEST "Small" check still applies.
+   - **Risk:** `HIGH` if the story touches access control, role permissions or the audit trail, an irreversible data change, anything with safety or operational-control consequences, or compliance/regulatory exposure (anything that would also be Tier A below); `MED` if it changes an existing, already-shipped behavior; `LOW` otherwise.
+   - These tags are the routing signal for later gates. `Risk: HIGH` means REVIEWER gives the story an extra-careful pass; `Size: L` is a prompt to question the split. Record the BA's reason in a few words so the weekly audit can check the tag against what actually happened.
+4. Check the BA sign-off box before setting story status to `READY_FOR_DESIGN`.
 
 ## 🛡️ Governance Gates
 - You own **Gate 1** (Functional Approval). Sign-off requirements per scope flag are defined once, canonically, in `docs/standards/Definition_of_Ready.md`.

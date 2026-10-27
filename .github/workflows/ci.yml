@@ -1,0 +1,135 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+    paths-ignore:
+      - "**/*.md"
+      - "docs/**"
+      - ".gitignore"
+  pull_request:
+    branches: ["**"]
+    paths-ignore:
+      - "**/*.md"
+      - "docs/**"
+      - ".gitignore"
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: Backend - Build and Verify
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: temurin
+          cache: maven
+
+      # Testcontainers starts the PostGIS container itself, using the bootstrap superuser as
+      # the Flyway admin and the non-superuser eam_runtime role for app traffic (see
+      # AbstractPostgresIT). Checkstyle, PMD and the JaCoCo branch floor all run in verify.
+      - name: Verify
+        working-directory: backend
+        run: ./mvnw -B verify
+
+      - name: Upload JaCoCo report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: backend/target/site/jacoco/
+
+  # Report-only: surfaces vacuous tests the JaCoCo line/branch floor cannot see.
+  mutation:
+    name: Backend - Mutation Report (report-only)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: temurin
+          cache: maven
+
+      - name: Mutation coverage (unit tests only)
+        working-directory: backend
+        run: ./mvnw -B test-compile pitest:mutationCoverage
+
+      - name: Upload PIT report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pit-report
+          path: backend/target/pit-reports/
+
+  # Report-only: flags new endpoints whose resource already exists in another controller or
+  # story (CODER.md Service Reuse Check step 5). Switch to --strict once the report is quiet.
+  endpoint-overlap:
+    name: Endpoint Capability Overlap (report-only)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Script tests
+        run: node --test scripts/endpoint-overlap/*.test.mjs
+
+      - name: Overlap report
+        run: node scripts/endpoint-overlap/check-endpoint-overlap.mjs --base origin/${{ github.base_ref }}
+
+  # Blocking: a UI story at CODE_REVIEW or later must have valid screenshots and, past
+  # REVIEW_PASSED, a REVIEWER VISUAL PASS (docs/standards/Definition_of_Done.md). Backstop for
+  # status edits that bypass the local hook.
+  visual-evidence:
+    name: Visual Evidence Gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Script tests
+        run: node --test scripts/visual-check/*.test.mjs
+
+      - name: Check gated UI stories
+        run: node scripts/visual-check/check-visual-evidence.mjs --all
+
+  frontend:
+    name: Frontend - Lint, Test and Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci --legacy-peer-deps
+
+      - name: Lint
+        working-directory: frontend
+        run: npm run lint
+
+      - name: Test
+        working-directory: frontend
+        run: npm run test
+
+      - name: Build
+        working-directory: frontend
+        run: npm run build

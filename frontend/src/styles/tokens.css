@@ -1,0 +1,64 @@
+/* Design tokens from docs/standards/style-guide.md (v1). Do not add values here without updating the guide. */
+:root,
+:root[data-theme='dark'] {
+  --bg: #0a1120;
+  --surface: #111b2f;
+  --surface-2: #17243d;
+  --border: #25365a;
+  --text: #e8eef9;
+  --muted: #9db0cc;
+  --primary: #22d3ee;
+  --primary-text: #04222b;
+  --primary-soft: rgba(34, 211, 238, 0.14);
+  --critical: #ff6b6b;
+  --major: #ffb020;
+  --minor: #60a5fa;
+  --ok: #34d399;
+  --critical-bg: rgba(255, 107, 107, 0.14);
+  --major-bg: rgba(255, 176, 32, 0.14);
+  --minor-bg: rgba(96, 165, 250, 0.14);
+  --ok-bg: rgba(52, 211, 153, 0.14);
+  --grid-line: rgba(34, 211, 238, 0.07);
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --bg: #eef2f7;
+  --surface: #ffffff;
+  --surface-2: #f4f7fb;
+  --border: #cfd8e5;
+  --text: #0e1a2c;
+  --muted: #44556e;
+  --primary: #0369a1;
+  --primary-text: #ffffff;
+  --primary-soft: rgba(3, 105, 161, 0.1);
+  --critical: #b42318;
+  --major: #8a4b00;
+  --minor: #1d4ed8;
+  --ok: #0b7a4b;
+  --critical-bg: #fdecea;
+  --major-bg: #fff3dc;
+  --minor-bg: #e6eefe;
+  --ok-bg: #def5ea;
+  --grid-line: rgba(3, 105, 161, 0.06);
+  --shadow: 0 4px 16px rgba(14, 26, 44, 0.1);
+  color-scheme: light;
+}
+
+:root {
+  --fs-sm: 13px;
+  --fs-base: 15px;
+  --fs-lg: 20px;
+  --fs-xl: 30px;
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s6: 24px;
+  --s8: 32px;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --font: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Consolas, monospace;
+}

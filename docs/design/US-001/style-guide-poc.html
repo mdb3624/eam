@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EAM Style Guide POC v2</title>
+<style>
+:root[data-theme="dark"] {
+  --bg: #0a1120; --surface: #111b2f; --surface-2: #17243d; --border: #25365a;
+  --text: #e8eef9; --muted: #9db0cc;
+  --primary: #22d3ee; --primary-text: #04222b; --primary-soft: rgba(34,211,238,.14);
+  --critical: #ff6b6b; --major: #ffb020; --minor: #60a5fa; --ok: #34d399;
+  --critical-bg: rgba(255,107,107,.14); --major-bg: rgba(255,176,32,.14);
+  --minor-bg: rgba(96,165,250,.14); --ok-bg: rgba(52,211,153,.14);
+  --grid-line: rgba(34,211,238,.07); --shadow: 0 8px 24px rgba(0,0,0,.35);
+}
+:root[data-theme="light"] {
+  --bg: #eef2f7; --surface: #ffffff; --surface-2: #f4f7fb; --border: #cfd8e5;
+  --text: #0e1a2c; --muted: #44556e;
+  --primary: #0369a1; --primary-text: #ffffff; --primary-soft: rgba(3,105,161,.10);
+  --critical: #b42318; --major: #8a4b00; --minor: #1d4ed8; --ok: #0b7a4b;
+  --critical-bg: #fdecea; --major-bg: #fff3dc; --minor-bg: #e6eefe; --ok-bg: #def5ea;
+  --grid-line: rgba(3,105,161,.06); --shadow: 0 4px 16px rgba(14,26,44,.10);
+}
+:root {
+  --fs-sm: 13px; --fs-base: 15px; --fs-lg: 20px; --fs-xl: 30px;
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s6: 24px; --s8: 32px;
+  --radius: 10px; --radius-sm: 6px;
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 400 var(--fs-base)/1.5 var(--font); }
+h1, h2, h3 { margin: 0 0 var(--s3); line-height: 1.2; font-weight: 650; letter-spacing: -.01em; }
+h1 { font-size: var(--fs-xl); } h2 { font-size: var(--fs-lg); } h3 { font-size: var(--fs-base); }
+.muted { color: var(--muted); font-size: var(--fs-sm); }
+.mono { font-family: var(--mono); }
+.eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: 11px; color: var(--primary); font-weight: 650; }
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+/* buttons + inputs */
+.btn { min-height: 44px; padding: 0 var(--s4); border-radius: var(--radius-sm); border: 1px solid transparent;
+  font: 600 var(--fs-base) var(--font); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: var(--s2); }
+.btn-primary { background: var(--primary); color: var(--primary-text); }
+.btn-primary:hover { filter: brightness(1.08); }
+.btn-primary:disabled { opacity: .45; cursor: not-allowed; filter: none; }
+.btn-ghost { background: transparent; color: var(--text); border-color: var(--border); }
+.btn-ghost:hover { background: var(--surface-2); }
+label { display: block; font-size: var(--fs-sm); font-weight: 600; color: var(--muted); margin-bottom: var(--s1); }
+input[type=email], input[type=password], input[type=text], select { width: 100%; min-height: 44px; padding: 0 var(--s3);
+  background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-sm); font: inherit; }
+input::placeholder { color: var(--muted); opacity: .7; }
+input[aria-invalid="true"] { border-color: var(--critical); }
+.field { margin-bottom: var(--s4); }
+.field-error { color: var(--critical); font-size: var(--fs-sm); margin-top: var(--s1); }
+.banner { display: flex; gap: var(--s2); align-items: flex-start; background: var(--critical-bg); color: var(--critical);
+  border: 1px solid var(--critical); border-radius: var(--radius-sm); padding: var(--s3); margin-bottom: var(--s4); font-size: var(--fs-sm); }
+.banner b { white-space: nowrap; }
+
+/* chips */
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 650; border: 1px solid currentColor; }
+.chip svg { width: 12px; height: 12px; fill: currentColor; }
+.chip-critical { color: var(--critical); background: var(--critical-bg); }
+.chip-major { color: var(--major); background: var(--major-bg); }
+.chip-minor { color: var(--minor); background: var(--minor-bg); }
+.chip-ok { color: var(--ok); background: var(--ok-bg); }
+.badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 650; color: var(--primary); background: var(--primary-soft); border: 1px solid var(--primary); }
+
+/* app shell */
+.app { display: grid; grid-template-columns: 232px 1fr; min-height: 420px; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--bg); box-shadow: var(--shadow); }
+.side { background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: var(--s4) var(--s3); gap: var(--s4); }
+.logo { display: flex; align-items: center; gap: var(--s3); font-weight: 700; letter-spacing: .02em; padding: 0 var(--s2); }
+.logo svg { width: 30px; height: 30px; }
+.logo small { display: block; font-size: 10px; letter-spacing: .14em; color: var(--muted); font-weight: 600; }
+.nav { display: flex; flex-direction: column; gap: var(--s1); }
+.nav a { display: flex; align-items: center; gap: var(--s3); min-height: 44px; padding: 0 var(--s3); border-radius: var(--radius-sm);
+  color: var(--muted); text-decoration: none; border-left: 3px solid transparent; }
+.nav a svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.nav a:hover { background: var(--surface-2); color: var(--text); }
+.nav a[aria-current="page"] { background: var(--primary-soft); color: var(--text); border-left-color: var(--primary); font-weight: 650; }
+.nav a[aria-current="page"] svg { color: var(--primary); }
+.me { margin-top: auto; padding: var(--s3); border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-2); display: grid; gap: var(--s2); }
+.me .email { font-size: var(--fs-sm); word-break: break-all; }
+.main { padding: var(--s6); min-width: 0; }
+.stage { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--s6); }
+.placeholder { text-align: left; padding: var(--s6) 0; }
+
+/* login */
+.login { display: grid; grid-template-columns: 1.1fr 1fr; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); min-height: 440px; }
+.brandpane { position: relative; padding: var(--s8); background:
+  linear-gradient(160deg, var(--surface) 0%, var(--bg) 100%);
+  background-image: linear-gradient(var(--grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--grid-line) 1px, transparent 1px), linear-gradient(160deg, var(--surface), var(--bg));
+  background-size: 28px 28px, 28px 28px, 100% 100%; display: flex; flex-direction: column; justify-content: space-between; }
+.brandpane svg.lines { position: absolute; inset: auto 0 0 0; width: 100%; height: 55%; opacity: .9; }
+.brandpane h2 { font-size: 26px; max-width: 14ch; position: relative; }
+.brandpane p { position: relative; max-width: 34ch; }
+.formpane { padding: var(--s8); background: var(--surface); display: flex; flex-direction: column; justify-content: center; }
+.formpane h2 { margin-bottom: var(--s1); }
+.formpane .sub { margin-bottom: var(--s6); }
+
+/* data display */
+table { width: 100%; border-collapse: collapse; font-size: var(--fs-sm); }
+th { text-align: left; color: var(--muted); font-weight: 600; padding: var(--s2) var(--s3); border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: .06em; font-size: 11px; }
+td { padding: var(--s3); border-bottom: 1px solid var(--border); }
+tr:last-child td { border-bottom: 0; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--s6); box-shadow: var(--shadow); }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: var(--s2) var(--s4); font-size: var(--fs-sm); margin: 0; }
+.kv dt { color: var(--muted); } .kv dd { margin: 0; }
+.crumbs { display: flex; flex-wrap: wrap; gap: var(--s2); align-items: center; font-size: var(--fs-sm); color: var(--muted); margin-bottom: var(--s4); }
+.crumbs span.cur { color: var(--text); font-weight: 650; }
+
+/* page */
+.wrap { max-width: 1120px; margin: 0 auto; padding: var(--s6) var(--s4) var(--s8); }
+.top { display: flex; justify-content: space-between; align-items: flex-end; gap: var(--s4); flex-wrap: wrap; margin-bottom: var(--s6); }
+section { margin-bottom: var(--s8); }
+.grid { display: grid; gap: var(--s4); grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.swatches { display: grid; gap: var(--s3); grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+.sw { border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; background: var(--surface); font-size: var(--fs-sm); }
+.sw i { display: block; height: 44px; border-bottom: 1px solid var(--border); }
+.sw span { display: block; padding: var(--s2) var(--s3); }
+.sw b { display: block; font-family: var(--mono); font-size: 12px; }
+.row { display: flex; gap: var(--s3); flex-wrap: wrap; align-items: center; }
+.tabs { display: flex; gap: var(--s2); flex-wrap: wrap; margin-bottom: var(--s4); }
+.tabs button[aria-pressed="true"] { background: var(--primary); color: var(--primary-text); border-color: var(--primary); }
+.sp { display: flex; align-items: flex-end; gap: var(--s4); flex-wrap: wrap; }
+.sp small { display: block; text-align: center; font-size: 11px; color: var(--muted); margin-top: var(--s1); }
+
+@media (max-width: 760px) {
+  .app { grid-template-columns: 1fr; }
+  .side { flex-direction: row; flex-wrap: wrap; align-items: center; border-right: 0; border-bottom: 1px solid var(--border); }
+  .nav { flex-direction: row; flex: 1; overflow-x: auto; }
+  .me { margin-top: 0; }
+  .login { grid-template-columns: 1fr; }
+  .brandpane { min-height: 190px; padding: var(--s6); }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="eyebrow">Style guide v1 POC</div>
+      <h1>EAM, built for the control room</h1>
+      <p class="muted" style="margin:0;max-width:62ch">Dark by default for long shifts and low glare at the console. Light theme for tablets in daylight. Severity always pairs color with a shape and a word.</p>
+    </div>
+    <div class="row">
+      <button class="btn btn-ghost" id="theme" type="button" aria-pressed="false">Switch to light theme</button>
+    </div>
+  </div>
+
+  <section>
+    <h2>US-001 screens</h2>
+    <div class="tabs" role="group" aria-label="Preview state">
+      <button class="btn btn-ghost" type="button" data-s="login" aria-pressed="true">Login</button>
+      <button class="btn btn-ghost" type="button" data-s="error" aria-pressed="false">Wrong password</button>
+      <button class="btn btn-ghost" type="button" data-s="disabled" aria-pressed="false">Disabled account</button>
+      <button class="btn btn-ghost" type="button" data-s="home" aria-pressed="false">Role home</button>
+      <button class="btn btn-ghost" type="button" data-s="denied" aria-pressed="false">Access denied</button>
+      <button class="btn btn-ghost" type="button" data-s="norole" aria-pressed="false">No role</button>
+    </div>
+    <div id="preview"></div>
+    <p class="muted" style="margin-top:var(--s3)">Preview role:
+      <select id="role" aria-label="Role" style="width:auto;display:inline-block;min-height:36px">
+        <option value="DISPATCHER">Dispatcher</option>
+        <option value="OPERATOR">Control-Center Operator</option>
+        <option value="FIELD_TECHNICIAN">Field Technician</option>
+        <option value="MAINTENANCE_SUPERVISOR">Maintenance Supervisor</option>
+        <option value="SYSTEM_ADMIN">System Administrator</option>
+      </select></p>
+  </section>
+
+  <section>
+    <h2>In context: how the data will look (US-002 preview)</h2>
+    <div class="grid">
+      <div class="card">
+        <div class="crumbs"><span>Metro Electric</span> / <span>SUB-3</span> / <span>F-12</span> / <span class="cur">TX-4587</span></div>
+        <div class="row" style="justify-content:space-between;margin-bottom:var(--s4)">
+          <div><div class="muted">Asset ID</div><h2 class="mono" style="margin:0">TX-4587</h2></div>
+          <span class="chip chip-ok"><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="5"/></svg>In service</span>
+        </div>
+        <dl class="kv">
+          <dt>Type</dt><dd>Distribution transformer</dd>
+          <dt>Criticality</dt><dd><span class="chip chip-major"><svg viewBox="0 0 12 12"><path d="M6 0l6 11H0z"/></svg>High</span></dd>
+          <dt>Location</dt><dd class="mono">41.2565, -95.9345 <span class="muted">verified 3d ago</span></dd>
+          <dt>Manufacturer</dt><dd>Acme Power, model T-75, S/N 88213</dd>
+        </dl>
+      </div>
+      <div class="card">
+        <h3>Active alarms</h3>
+        <table>
+          <thead><tr><th>Severity</th><th>Asset</th><th>Event</th><th>Age</th></tr></thead>
+          <tbody>
+            <tr><td><span class="chip chip-critical"><svg viewBox="0 0 12 12"><path d="M6 0l6 6-6 6-6-6z"/></svg>Critical</span></td><td class="mono">TX-4587</td><td>Over-temperature</td><td class="mono">2m</td></tr>
+            <tr><td><span class="chip chip-major"><svg viewBox="0 0 12 12"><path d="M6 0l6 11H0z"/></svg>Major</span></td><td class="mono">F-12</td><td>Breaker trip</td><td class="mono">14m</td></tr>
+            <tr><td><span class="chip chip-minor"><svg viewBox="0 0 12 12"><rect x="1" y="1" width="10" height="10" rx="2"/></svg>Minor</span></td><td class="mono">SUB-3</td><td>Comms degraded</td><td class="mono">1h</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Tokens</h2>
+    <div class="swatches" id="swatches"></div>
+  </section>
+
+  <div class="grid">
+    <section class="card">
+      <h3>Type</h3>
+      <p style="font-size:var(--fs-xl);font-weight:650;margin:0;letter-spacing:-.01em">Inter 30 / 650</p>
+      <p style="font-size:var(--fs-lg);font-weight:650;margin:0">Heading 20 / 650</p>
+      <p style="margin:0">Body 15 / 400. Feeder F-12 restored.</p>
+      <p class="muted" style="margin:0">Muted 13 / 400</p>
+      <p class="mono" style="margin:0">Mono for IDs and coordinates: TX-4587</p>
+    </section>
+    <section class="card">
+      <h3>Spacing (4px base)</h3>
+      <div class="sp" id="sp"></div>
+    </section>
+    <section class="card">
+      <h3>Controls</h3>
+      <div class="row">
+        <button class="btn btn-primary" type="button">Sign in</button>
+        <button class="btn btn-primary" type="button" disabled>Signing in...</button>
+        <button class="btn btn-ghost" type="button">Sign out</button>
+      </div>
+      <div class="field" style="margin-top:var(--s4)"><label for="x">Email (error)</label>
+        <input id="x" type="email" value="maria@" aria-invalid="true" aria-describedby="xe">
+        <div class="field-error" id="xe">Enter a valid email address.</div></div>
+      <span class="badge">Dispatcher</span>
+    </section>
+  </div>
+</div>
+
+<script>
+var ICON = {
+  alarm: '<svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0112 0c0 7 3 8 3 8H3s3-1 3-8"/><path d="M10 20a2 2 0 004 0"/></svg>',
+  dispatch: '<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 4v16"/></svg>',
+  work: '<svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 00-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 005.4-5.4l-2.4 2.4-2.6-.6-.6-2.6z"/></svg>',
+  closure: '<svg viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>',
+  admin: '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></svg>'
+};
+var ROLES = {
+  OPERATOR: ['Alarm console', 'Control-Center Operator', 'alarm'],
+  DISPATCHER: ['Dispatch board', 'Dispatcher', 'dispatch'],
+  FIELD_TECHNICIAN: ['My work', 'Field Technician', 'work'],
+  MAINTENANCE_SUPERVISOR: ['Work order closure', 'Maintenance Supervisor', 'closure'],
+  SYSTEM_ADMIN: ['Administration', 'System Administrator', 'admin']
+};
+var LOGO = '<svg viewBox="0 0 32 32" aria-hidden="true"><polygon points="16,2 28,9 28,23 16,30 4,23 4,9" fill="none" stroke="var(--primary)" stroke-width="2"/><path d="M17.5 7L10 17h5l-1 8 8-11h-5z" fill="var(--primary)"/></svg>';
+var LINES = '<svg class="lines" viewBox="0 0 400 200" preserveAspectRatio="xMidYMax slice" aria-hidden="true" fill="none" stroke="var(--primary)" stroke-width="1.2" stroke-opacity=".55">' +
+  '<path d="M0 150 Q100 175 200 150 T400 150"/><path d="M0 120 Q100 145 200 120 T400 120" stroke-opacity=".35"/><path d="M0 90 Q100 115 200 90 T400 90" stroke-opacity=".2"/>' +
+  '<g stroke-width="2" stroke-opacity=".8"><path d="M60 200V110M40 125h40M45 138h30"/><path d="M200 200V90M175 108h50M182 122h36"/><path d="M340 200V110M320 125h40M325 138h30"/></g></svg>';
+var state = 'login';
+function form(banner) {
+  return '<div class="login"><div class="brandpane"><div class="logo">' + LOGO + '<div>EAM<small>ASSET AND FIELD OPERATIONS</small></div></div>' +
+    '<div><h2>Know the asset. Act on the alarm.</h2><p class="muted">One canonical record for every transformer, feeder and substation, from alarm to closed work order.</p></div>' + LINES + '</div>' +
+    '<div class="formpane"><h2>Sign in</h2><p class="muted sub">Use your utility email address.</p>' + (banner || '') +
+    '<form onsubmit="return false"><div class="field"><label for="e">Email</label><input id="e" type="email" autocomplete="username" placeholder="name@utility.com"></div>' +
+    '<div class="field"><label for="p">Password</label><input id="p" type="password" autocomplete="current-password"></div>' +
+    '<button class="btn btn-primary" style="width:100%" type="submit">Sign in</button></form></div></div>';
+}
+function banner(msg) { return '<div class="banner" role="alert"><b>Error:</b><span>' + msg + '</span></div>'; }
+function shell(body, noRole) {
+  var r = ROLES[document.getElementById('role').value];
+  var nav = noRole ? '' : '<a href="#" aria-current="page">' + ICON[r[2]] + r[0] + '</a>';
+  return '<div class="app"><aside class="side"><div class="logo">' + LOGO + '<div>EAM<small>ASSET AND FIELD OPS</small></div></div>' +
+    '<nav class="nav" aria-label="Main">' + nav + '</nav><div class="me"><span class="email">maria@utility.com</span>' +
+    '<span><span class="badge">' + (noRole ? 'No role assigned' : r[1]) + '</span></span><button class="btn btn-ghost" type="button">Sign out</button></div></aside>' +
+    '<div class="main"><div class="stage">' + body + '</div></div></div>';
+}
+function render() {
+  var r = ROLES[document.getElementById('role').value], h = '';
+  if (state === 'login') h = form();
+  if (state === 'error') h = form(banner('Invalid email or password.'));
+  if (state === 'disabled') h = form(banner('This account is disabled. Contact your administrator.'));
+  if (state === 'home') h = shell('<div class="placeholder"><div class="eyebrow">' + r[1] + '</div><h2>' + r[0] + '</h2><p class="muted">This screen is coming in a later release.</p></div>');
+  if (state === 'denied') h = shell('<div class="placeholder"><h2>Access denied</h2><p>You do not have access to this screen.</p><a href="#" style="color:var(--primary)">Go to your home screen</a></div>');
+  if (state === 'norole') h = shell('<div class="placeholder"><h2>Access denied</h2><p>You do not have access to this screen.</p></div>', true);
+  document.getElementById('preview').innerHTML = h;
+}
+document.querySelectorAll('[data-s]').forEach(function (b) {
+  b.addEventListener('click', function () {
+    state = b.dataset.s;
+    document.querySelectorAll('[data-s]').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+    render();
+  });
+});
+document.getElementById('role').addEventListener('change', render);
+document.getElementById('theme').addEventListener('click', function () {
+  var root = document.documentElement, light = root.dataset.theme === 'dark';
+  root.dataset.theme = light ? 'light' : 'dark';
+  this.textContent = light ? 'Switch to dark theme' : 'Switch to light theme';
+  this.setAttribute('aria-pressed', String(light));
+});
+var TOK = [['--bg','Page'],['--surface','Panels'],['--surface-2','Inputs, rows'],['--border','Dividers'],['--text','Body text'],['--muted','Secondary text'],
+  ['--primary','Actions, active nav'],['--critical','Critical, errors'],['--major','Major, high'],['--minor','Minor'],['--ok','In service, ok']];
+var sw = document.getElementById('swatches');
+TOK.forEach(function (t) { var d = document.createElement('div'); d.className = 'sw';
+  d.innerHTML = '<i style="background:var(' + t[0] + ')"></i><span><b>' + t[0] + '</b>' + t[1] + '</span>'; sw.appendChild(d); });
+var sp = document.getElementById('sp');
+[[1,4],[2,8],[3,12],[4,16],[6,24],[8,32]].forEach(function (s) { var w = document.createElement('div');
+  w.innerHTML = '<div style="width:' + s[1] + 'px;height:' + s[1] + 'px;background:var(--primary);border-radius:2px"></div><small>s' + s[0] + ' ' + s[1] + '</small>'; sp.appendChild(w); });
+render();
+</script>
+</body>
+</html>

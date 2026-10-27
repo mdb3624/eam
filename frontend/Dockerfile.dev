@@ -1,0 +1,8 @@
+FROM node:20
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --legacy-peer-deps
+COPY . .
+EXPOSE 5273
+ENV VITE_PORT=5273
+CMD ["npm", "run", "dev", "--", "--host"]

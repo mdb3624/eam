@@ -30,6 +30,16 @@ Before marking any story DONE, the developer must verify the golden path end-to-
 
 A story cannot be marked DONE if any step above produces a console error, network 4xx/5xx, or blank UI.
 
-## 🎨 Visual Parity Gate (UI stories, if this project has a design reference)
+## 🎨 Visual Evidence Gate (UI stories: Scope FULL_STACK or UI_ONLY)
 
-Before marking any UI story DONE, the REVIEWER must perform a Visual Parity Audit against the design reference. Automated tests passing is NOT sufficient evidence for UI stories — REVIEWER must visually confirm parity before issuing a PASS verdict.
+Passing tests and an accessibility-tree check are NOT visual verification. US-001 was moved to CODE_REVIEW that way; real screenshots then showed overlapping text and a clipped phone layout, and an earlier "logged in" screenshot set was the login page because the dev proxy pointed at the wrong backend.
+
+Mechanical, not optional (`scripts/visual-check/`, enforced by `.claude/hooks/visual-evidence-guard.sh` and a blocking CI job):
+
+1. **HFD** defines `docs/design/<ID>/visual-checks.json`: every screen and state, a phone and a desktop width, every theme, and `expectText` that is only on the correct screen.
+2. **CODER** runs `node scripts/visual-check/capture.mjs --story <ID> --base <frontend url> --token <name>=<jwt>` against the real test stack. Screenshots are written to `docs/project/evidence/<ID>/` with `visual-report.json` (size, hash, horizontal overflow, expected-text check). CODER then **opens and looks at every PNG** and fixes what is wrong. A story cannot move to `CODE_REVIEW` without valid, fresh evidence (the hook blocks the status edit).
+3. **REVIEWER** opens every PNG, compares against the HFD design and style guide, and logs a `VISUAL` row in `gate_log.csv` (PASS or KICK_BACK). A story cannot move to `REVIEW_PASSED`, `LIBRARIAN_VERIFICATION` or `DONE` without a REVIEWER `VISUAL PASS` newer than the evidence. CODER cannot sign their own evidence.
+4. Evidence goes stale when `frontend/src` changes after capture; re-capture and re-review.
+5. Capture uses Playwright (devDependency of `frontend/`, also installed globally with `npm install -g playwright`) driving an installed Edge or Chrome, or bundled Chromium. If a screenshot tool saves somewhere you cannot open (for example the Docker MCP browser, which saves inside its container), use `capture.mjs`. Never fall back to the accessibility tree and call it done. Interactive states (error banners, validation) are captured with `steps` in `visual-checks.json`.
+
+Check any time: `node scripts/visual-check/check-visual-evidence.mjs --story <ID> [--level 2]` or `--all`.

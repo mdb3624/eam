@@ -148,6 +148,7 @@ When submitting to REVIEWER:
 4. Coverage report (branch %)
 5. All tests passing
 6. Code builds cleanly
+7. **Visual evidence (UI stories, Scope FULL_STACK or UI_ONLY):** run `scripts/visual-check/capture.mjs` against the real test stack, then open and look at every screenshot and fix defects before submitting. The status change to `CODE_REVIEW` is blocked without fresh, valid evidence. See `docs/standards/Definition_of_Done.md`, Visual Evidence Gate. An accessibility snapshot or green tests are not a substitute.
 
 ---
 
