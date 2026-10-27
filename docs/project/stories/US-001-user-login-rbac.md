@@ -2,7 +2,7 @@
 
 **Epic:** EPIC-01 Platform Foundation
 **Actor:** All MVP personas (Maria, Dwayne, Jess, Priya, Sam) — administered by Sam Whitfield, System Administrator
-**Status:** REVIEW_PASSED (REVIEWER PASS and VISUAL PASS 2026-10-27, CI green; awaiting PR merge and LIBRARIAN DONE sign-off)
+**Status:** DONE (PR #7 merged 2026-10-27, merge commit 5b90e2c; LIBRARIAN sign-off below)
 **Scope:** FULL_STACK
 
 ## User Story
@@ -222,3 +222,28 @@ docs/standards/style-guide.md
 - AC 1, 2, 3 and the disabled-account edge case pass. The session-expiry edge case is partial: the "without losing unsaved field-form data" clause is not implemented. Carried to US-019.
 - Scope drift recorded in `Sprint_Log.md` (2026-10-27). Owner to choose scope amendment or INF ticket.
 - Debt: frontend coverage unmeasured (`@vitest/coverage-v8` missing); no session-expired screenshot; scope-guard hook wrote no `CODER_SCOPE` rows for out-of-scope files.
+
+## Librarian Sign-Off: US-001 (User Login and Role-Based Access)
+
+**Date:** 2026-10-27
+**Reviewer:** REVIEWER role (separate session), PASS and VISUAL PASS in `docs/project/gate_log.csv`
+**Librarian:** LIBRARIAN role, run via sprint-run on owner go (Mike Barnes)
+**Status:** DONE
+
+## Verification Checklist
+
+- [x] Design document complete (`docs/design/US-001/login-and-shell.md`, Architect Design section above)
+- [x] Code review PASSED (REVIEWER PASS after CI run 40553689502 went green)
+- [x] Coverage clears the 65% CI floor: backend branch coverage about 92.9% (target 80% met). Frontend coverage unmeasured (`@vitest/coverage-v8` not installed), carried as debt.
+- [x] All Gherkin ACs implemented and tested. Edge case "session expiry without losing unsaved form data" is partial and carried to US-019.
+- [x] Traceability verified: story, design doc, code (PR #7, merge commit 5b90e2c), gate log rows, Story_Map row. The requirements link is epic-level only (EPIC-01, MVP Area A in Story_Map); the story file itself does not cite a requirements section.
+- [x] PR merge state verified on GitHub: PR #7 MERGED at 2026-10-27T18:20:04Z.
+- [x] Visual evidence: `node scripts/visual-check/check-visual-evidence.mjs --story US-001 --level 2` returned "US-001: visual evidence OK." on main after the merge.
+
+## Test Results
+
+- CI run 40553689502 (branch) and 40558577480 (PR #7): all required checks pass.
+- Backend: 34 unit + 31 integration, 0 failed. Frontend: 41 passed, 0 failed.
+
+**Signed:** LIBRARIAN
+**Date:** 2026-10-27

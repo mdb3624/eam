@@ -37,3 +37,10 @@ Owned by LIBRARIAN. Append-only decision/status log.
 - **Open, owner decision:** scope drift. Files changed after the story's scope guard that are not in Files in Scope: `DataSourceIsolationIT`, `scripts/visual-check/*`, `.claude/hooks/visual-evidence-guard.sh`, `.claude/settings.json`, `.claude/rules/*`, root `CLAUDE.md`, `docs/roles/*`, `docs/standards/*`, the US-002 story doc, and US-001 evidence files. Mostly harness and governance work. Options: amend the story's Files in Scope, or file an INF ticket.
 - **Debt:** frontend coverage tool (`@vitest/coverage-v8`) not installed, so frontend coverage is unmeasured. No screenshot of the session-expired banner. Scope-guard hook wrote no `CODER_SCOPE` rows for the out-of-scope files; check the hook.
 - **Known and documented:** a disabled user keeps a valid token until expiry; no rate limiting.
+
+## 2026-10-27 — US-001 DONE
+
+- **Action:** PR #7 merged to `main` (merge commit 5b90e2c, verified on GitHub). Level 2 visual evidence check passed on `main`. Librarian Sign-Off appended to the story file. US-001 moves REVIEW_PASSED → DONE.
+- **Unblocks:** US-002 (needs the tenant bound to web requests from US-001). Next gate: ARCHITECT design.
+- **Still open from the REVIEWER pass:** scope drift decision (amend Files in Scope or INF ticket), session-expiry clause carried to US-019, frontend coverage tool missing, scope-guard hook wrote no CODER_SCOPE rows for out-of-scope files.
+- **Process note:** this close-out is a follow-up commit after merge, not in the code PR, because DONE requires a verified merge. The LIBRARIAN rule says close-out ships in the same PR as the code, so for DONE-after-merge stories there is a tension to resolve in the role docs.
