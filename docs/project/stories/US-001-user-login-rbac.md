@@ -247,3 +247,4 @@ docs/standards/style-guide.md
 
 **Signed:** LIBRARIAN
 **Date:** 2026-10-27
+- Scope drift resolved by INF-001 (`docs/changes/INF-001-us-001-harness-and-governance-drift.md`): the 20 out-of-scope files are recorded there, and the scope-guard hook that failed to flag them is fixed.

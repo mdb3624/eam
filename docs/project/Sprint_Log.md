@@ -44,3 +44,10 @@ Owned by LIBRARIAN. Append-only decision/status log.
 - **Unblocks:** US-002 (needs the tenant bound to web requests from US-001). Next gate: ARCHITECT design.
 - **Still open from the REVIEWER pass:** scope drift decision (amend Files in Scope or INF ticket), session-expiry clause carried to US-019, frontend coverage tool missing, scope-guard hook wrote no CODER_SCOPE rows for out-of-scope files.
 - **Process note:** this close-out is a follow-up commit after merge, not in the code PR, because DONE requires a verified merge. The LIBRARIAN rule says close-out ships in the same PR as the code, so for DONE-after-merge stories there is a tension to resolve in the role docs.
+
+## 2026-10-27 — INF-001: US-001 scope drift resolved
+
+- **Decision:** file an INF ticket, do not amend US-001's Files in Scope. US-001 is DONE and merged, and the 20 out-of-scope files are harness and governance work, not login.
+- **Root cause of the silent guard:** `ARCHITECT.md` says one path per line; the scope-guard hook only read `- ` bullets, so it saw an empty scope on US-001 and never logged a `CODER_SCOPE` row. The hook now reads both formats and always allows the story's evidence directory.
+- **Evidence:** `scripts/scope-guard/test.sh`, 14 cases pass; against the previous hook 4 fail.
+- **Record:** `docs/changes/INF-001-us-001-harness-and-governance-drift.md`. The "Open, owner decision" scope-drift item in the 2026-10-27 US-001 entry is closed.
