@@ -181,8 +181,21 @@ export function evaluateEvidence({ story, report, hashesOnDisk, requirements, so
  */
 export function coverageProblems({ storyText, config }) {
   const text = storyText ?? "";
-  const section = (heading) =>
-    new RegExp("^#{2,3} " + heading + "[^\\n]*\\n([\\s\\S]*?)(?=^#{2,3} |(?![\\s\\S]))", "m").exec(text)?.[1];
+  // A section runs to the next heading of the same or a higher level, so `###` subsections belong to it (INF-004).
+  const section = (heading) => {
+    const lines = text.split(/\r?\n/);
+    const opener = new RegExp("^(#{2,3}) " + heading);
+    const start = lines.findIndex((l) => opener.test(l));
+    if (start === -1) return undefined;
+    const level = opener.exec(lines[start])[1].length;
+    const body = [];
+    for (const l of lines.slice(start + 1)) {
+      const m = /^(#+) /.exec(l);
+      if (m && m[1].length <= level) break;
+      body.push(l);
+    }
+    return body.join("\n");
+  };
   const design = section("Architect Design") ?? "";
   const states = [...new Set([...design.matchAll(/state:([A-Za-z0-9_-]+)/g)].map((m) => `state:${m[1]}`))];
   const covered = new Set((config?.shots ?? []).flatMap((s) => s.covers ?? []));

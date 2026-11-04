@@ -306,6 +306,28 @@ test("coverageProblems counts ACs only inside the Acceptance Criteria section", 
   assert.deepEqual(problems, []);
 });
 
+// INF-004: a ## Architect Design holds ### subsections (Schema, API, Frontend); states under them count.
+test("coverageProblems reads states under ### subsections of ## Architect Design", () => {
+  const story = [
+    "## Acceptance Criteria (Gherkin)",
+    "```gherkin",
+    "Scenario: One",
+    "```",
+    "## Architect Design (ARCHITECT, 2026-11-03)",
+    "### Schema",
+    "text",
+    "### Frontend",
+    "- state:search-idle",
+    "- state:session-expired",
+    "### Config wiring",
+    "- state:in-later-subsection",
+    "## Files in Scope",
+    "state:after-design",
+  ].join("\n");
+  const problems = coverageProblems({ storyText: story, config: { shots: [{ name: "a", covers: ["AC1", "state:search-idle"] }] } });
+  assert.deepEqual(problems.map((p) => /covers (\S+?)\.\s/.exec(p)[1]), ["state:session-expired", "state:in-later-subsection"]);
+});
+
 test("coverageProblems fails loudly when covers are declared but the story text is empty", () => {
   const problems = coverageProblems({ storyText: "", config: { shots: [{ name: "a", covers: ["AC1"] }] } });
   assert.equal(problems.length, 1);
