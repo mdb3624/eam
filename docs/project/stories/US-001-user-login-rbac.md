@@ -150,10 +150,12 @@ New property `EAM_JWT_SECRET` -> `eam.auth.jwt-secret` in `application.yml`; pas
 - Navigation shows only items for screens that exist for the user role. A user with no role sees no navigation and an access denied message.
 - Token kept in `sessionStorage`; a 401 from any API call clears it and routes to Login with the session-expired message.
 
-### Known gaps carried as debt (not blocking)
+### Gaps found at design time (historical; now tracked as change requests)
 
-- A disabled or deleted user keeps a valid token until it expires (TTL 1h). Revocation arrives with refresh tokens.
-- No login rate limiting or lockout. Needs its own story.
+Recorded 2026-10-20. Under the no-debt rule (INF-002) each is a CHG-###, filed 2026-11-03.
+
+- A disabled or deleted user keeps a valid token until it expires (TTL 1h). Tracked as CHG-003.
+- No login rate limiting or lockout. Tracked as CHG-004.
 
 ## Files in Scope
 
@@ -221,7 +223,7 @@ docs/standards/style-guide.md
 - REVIEWER: KICK_BACK (CI not verifiable) then PASS after CI run 40553689502 went green. VISUAL PASS, 14 shots. See `docs/project/gate_log.csv`.
 - AC 1, 2, 3 and the disabled-account edge case pass. The session-expiry edge case is partial: the "without losing unsaved field-form data" clause is not implemented. Carried to US-019.
 - Scope drift recorded in `Sprint_Log.md` (2026-10-27). Owner to choose scope amendment or INF ticket.
-- Debt: frontend coverage unmeasured (`@vitest/coverage-v8` missing); no session-expired screenshot; scope-guard hook wrote no `CODER_SCOPE` rows for out-of-scope files.
+- Gaps found at review, now tracked: frontend coverage unmeasured (`@vitest/coverage-v8` missing) is CHG-001; no session-expired screenshot is CHG-002; the scope-guard hook writing no `CODER_SCOPE` rows was a parser bug, fixed by INF-001 (the guard's warn-mode default is CHG-005).
 
 ## Librarian Sign-Off: US-001 (User Login and Role-Based Access)
 
@@ -234,7 +236,7 @@ docs/standards/style-guide.md
 
 - [x] Design document complete (`docs/design/US-001/login-and-shell.md`, Architect Design section above)
 - [x] Code review PASSED (REVIEWER PASS after CI run 40553689502 went green)
-- [x] Coverage clears the 65% CI floor: backend branch coverage about 92.9% (target 80% met). Frontend coverage unmeasured (`@vitest/coverage-v8` not installed), carried as debt.
+- [x] Coverage clears the 65% CI floor: backend branch coverage about 92.9% (target 80% met). Frontend coverage unmeasured (`@vitest/coverage-v8` not installed); tracked as CHG-001. No session-expired screenshot; tracked as CHG-002.
 - [x] All Gherkin ACs implemented and tested. Edge case "session expiry without losing unsaved form data" is partial and carried to US-019.
 - [x] Traceability verified: story, design doc, code (PR #7, merge commit 5b90e2c), gate log rows, Story_Map row. The requirements link is epic-level only (EPIC-01, MVP Area A in Story_Map); the story file itself does not cite a requirements section.
 - [x] PR merge state verified on GitHub: PR #7 MERGED at 2026-10-27T18:20:04Z.

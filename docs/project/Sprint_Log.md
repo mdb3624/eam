@@ -51,3 +51,10 @@ Owned by LIBRARIAN. Append-only decision/status log.
 - **Root cause of the silent guard:** `ARCHITECT.md` says one path per line; the scope-guard hook only read `- ` bullets, so it saw an empty scope on US-001 and never logged a `CODER_SCOPE` row. The hook now reads both formats and always allows the story's evidence directory.
 - **Evidence:** `scripts/scope-guard/test.sh`, 14 cases pass; against the previous hook 4 fail.
 - **Record:** `docs/changes/INF-001-us-001-harness-and-governance-drift.md`. The "Open, owner decision" scope-drift item in the 2026-10-27 US-001 entry is closed.
+
+## 2026-11-03 - INF-002 applied, CHG-001 to CHG-006 filed
+
+- **Owner rule:** no debt carried. Debt found before a story's design is approved is fixed in the story. After design approval it is a CHG-### routed to LIBRARIAN. A change to approved ACs is always a CHG-###. Tier A gaps go to the owner.
+- **Why:** US-001 reached DONE with five known gaps. REVIEWER.md allowed "Approve but flag" and LIBRARIAN.md said to log debt silently. Both are replaced.
+- **INF-002 applied (pending REVIEWER and merge):** REVIEWER, LIBRARIAN, ARCHITECT, HFD, CODER role docs and the Definition of Done. `check-visual-evidence.mjs` now fails when a shot does not cover every AC and every architect `state:`.
+- **Filed, all OPEN awaiting LIBRARIAN decision:** CHG-001 frontend coverage unmeasured; CHG-002 no session-expired screenshot; CHG-003 disabled user keeps a valid token (Tier A); CHG-004 no login rate limiting (Tier A); CHG-005 scope guard in warn mode; CHG-006 US-002 multi-field asset search.

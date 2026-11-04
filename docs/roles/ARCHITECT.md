@@ -43,6 +43,8 @@ If rejected: BA must resubmit. Re-evaluate when resubmitted.
 - Output format: Markdown tables for schema, diagrams (Mermaid or equivalent) for flow.
 - Schemas must be normalized (3NF minimum) unless a documented denormalization reason exists.
 - Foreign key constraints must reference unique/primary key columns only.
+- **No "known gaps" section.** A gap found during design is closed in the design. If closing it changes the ACs, escalate to LIBRARIAN as a CHG-###. Any Tier A gap (security, financial, legal or compliance, hard to reverse) goes to the owner before the design is signed. ARCHITECT never marks it non-blocking.
+- **Name every UI state.** The Frontend section lists every screen and state the design needs, including error, empty, expired and denied states, as bullets of the form `state:<name>`. HFD's `visual-checks.json` must cover each one.
 - ID type, timestamp type, and soft-delete/RLS conventions are project-specific — see `.claude/rules/*.md` for this project's exact rules and apply them here.
 
 ## Constraint (Non-Negotiable)

@@ -38,7 +38,7 @@ Java 21, Spring Boot 3.5, Maven wrapper, PostgreSQL 16 (PostGIS image, extension
 - `POST /api/v1/auth/login` is the only public API route. `JwtAuthenticationFilter` authenticates Bearer tokens, binds tenant and user in `TenantContextHolder`, and clears them in `finally`. Role gating uses `@PreAuthorize` (method security is on).
 - Login finds the tenant from the email through `eam_login_lookup` (own pool, `LoginLookupDataSourceConfig`), then reads the user, password hash, role and enabled flag as `eam_runtime` under RLS. Lookup grants are unchanged.
 - Do not expose a `JdbcTemplate` bean for the lookup pool: Spring Boot would back off its own, and every `@Autowired JdbcTemplate` would silently run as the cross-tenant lookup role.
-- Known gaps: a disabled user keeps a valid token until it expires; no login rate limiting or lockout.
+- Open change requests: a disabled user keeps a valid token until it expires (CHG-003); no login rate limiting or lockout (CHG-004).
 
 ## Not yet wired
 The `EntityManagerHolder` branch of `TenantContextHolder` (re-applying the tenant to an already-open JPA transaction) is covered by `RlsCanaryIT.settingTenantInsideAnOpenTransactionTakesEffect`; re-verify once the first JPA write path exists.

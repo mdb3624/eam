@@ -8,8 +8,9 @@
 * ❌ **Contract Table Violation (if this project uses a Field Contract Table):** Any `UI Field` in the story's Field Contract Table does not have its value rendered from the corresponding `API Param` in the implementation.
 * ❌ **Missing or Unviewed Visual Evidence (UI stories):** `docs/project/evidence/<ID>/visual-report.json` is absent, stale (frontend changed after capture), or fails `node scripts/visual-check/check-visual-evidence.mjs --story <ID>`; OR REVIEWER did not open every PNG. Open each screenshot, compare to the HFD design and `docs/standards/style-guide.md`, and check: text overlap, clipping, horizontal overflow, contrast, wrong screen or state, both themes, phone and desktop. Then log a `VISUAL` row in `gate_log.csv` (`PASS`, or `KICK_BACK` with `VISUAL_DEFECT` and the screenshot name). No REVIEWER `VISUAL PASS` means no `REVIEW_PASSED`.
 * ❌ **E2E/Test Failure:** Any required test suite has failures or was skipped.
+* ❌ **Unmeasurable target:** a coverage or metric target that cannot be measured in this run (tool missing, report not produced) is a fail, not a note.
 * ❌ **Complexity:** CI already auto-rejects (build failure) any method whose complexity/coverage signal exceeds the configured threshold — that's the mechanical floor, not this checklist's bar.
-* ❌ **Test Coverage:** CI already auto-rejects (build failure) below the 65% branch coverage floor. 80% remains the target: treat the range between floor and target as a judgment call (approve with a technical-debt note, or request more tests) rather than an automatic reject.
+* ❌ **Test Coverage:** CI already auto-rejects (build failure) below the 65% branch coverage floor. 80% remains the target: treat the range between floor and target as a judgment call (approve with a filed CHG-### for the shortfall, or request more tests) rather than an automatic reject.
 * ❌ **Platform Integrity Violation (all work, not phase-gated):** Same domain logic implemented in multiple services or classes. Single source of truth must be enforced.
 * ❌ **New Endpoint Without Overlap Check:** Any new endpoint in the PR must be checked against the story map and existing endpoints for a capability match — run the same check from CODER.md's Endpoint/Capability Overlap Check yourself; don't just trust CODER ran it.
 * ❌ **CI Status Not Verified:** Local test runs are NOT a substitute for actual CI status. REVIEWER must confirm the real CI pipeline is green, not just local runs, before issuing PASS.
@@ -53,7 +54,7 @@
 
 **REJECTED (Must fix before merge):** missing required evidence, test suite red, hard gate violation.
 
-**TECHNICAL DEBT (Approve but flag):** minor issues that don't break a hard gate but require future refactoring.
+**No debt carried:** a gap that does not break a hard gate is still not approved silently. REVIEWER files a CHG-### (template in `docs/roles/LIBRARIAN.md`) for it before issuing PASS, and the PASS row in `gate_log.csv` names the CHG id. A gap with no CHG id is a REJECT.
 
 ## Full Hard-Gate Checklist
 
@@ -88,4 +89,4 @@
 ### Review Verdicts
 - **APPROVED**: All boxes checked.
 - **REJECTED**: Failure to meet any hard gate.
-- **TECHNICAL DEBT**: Minor issues that don't break a hard gate but require future refactoring.
+- **APPROVED WITH CHG**: Hard gates pass; every remaining gap has a filed CHG-### id listed in the verdict.
