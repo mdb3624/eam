@@ -276,3 +276,38 @@ test("coverageProblems with no visual-checks.json fails when states exist", () =
   const problems = coverageProblems({ storyText: STORY_WITH_STATES, config: null });
   assert.equal(problems.length, 4);
 });
+
+// INF-002 REVIEWER findings: strict, loud edge cases.
+test("coverageProblems reads state names with underscores and capitals in full", () => {
+  const story = "```gherkin\nScenario: One\n```\n## Architect Design\n- state:session_expired\n- state:Empty\n## Files in Scope\n";
+  const problems = coverageProblems({ storyText: story, config: { shots: [{ name: "a", covers: ["AC1"] }] } });
+  assert.deepEqual(problems.map((p) => /covers (\S+?)\.\s/.exec(p)[1]), ["state:session_expired", "state:Empty"]);
+});
+
+test("coverageProblems reads a ### Architect Design heading", () => {
+  const story = "```gherkin\nScenario: One\n```\n### Architect Design\n- state:no-match\n## Files in Scope\n";
+  const problems = coverageProblems({ storyText: story, config: { shots: [{ name: "a", covers: ["AC1"] }] } });
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /state:no-match/);
+});
+
+test("coverageProblems counts ACs only inside the Acceptance Criteria section", () => {
+  const story = [
+    "## Acceptance Criteria (Gherkin)",
+    "```gherkin",
+    "Scenario: One",
+    "```",
+    "## Coder Evidence",
+    "Scenario: a note, not an AC",
+    "## Architect Design",
+    "- state:x",
+  ].join("\n");
+  const problems = coverageProblems({ storyText: story, config: { shots: [{ name: "a", covers: ["AC1", "state:x"] }] } });
+  assert.deepEqual(problems, []);
+});
+
+test("coverageProblems fails loudly when covers are declared but the story text is empty", () => {
+  const problems = coverageProblems({ storyText: "", config: { shots: [{ name: "a", covers: ["AC1"] }] } });
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /story document/);
+});

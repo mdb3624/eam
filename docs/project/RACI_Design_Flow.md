@@ -36,7 +36,7 @@ Reflects the Sequential Lock Protocol (`CLAUDE.md`) and the Fast-Track exception
 | Code Review — hard gates, coverage, CI status | I | I | I | C | **R/A** | I | — |
 | Visual Parity Audit (UI stories, DoD gate) | — | — | C | I | **R/A** | I | — |
 | Sequential Lock Protocol violation check (no backward requests; Fast-Track scope check; `[FAST-TRACK]` ledger entry exists) | — | — | — | C | **R/A** | I | — |
-| Technical Debt Ledger entry (standards violation found) | — | — | — | C | C | **R/A** | — |
+| CHG-### filed for a gap found after design approval (ledger row is an index only) | — | — | — | C | C | **R/A** | — |
 | Sprint_Log / Story_Map close-out (same PR as code; PR merge state verified) | — | — | — | C | I | **R/A** | — |
 | Post-merge branch cleanup | — | — | — | I | — | **R/A** | — |
 | Librarian Sign-Off → story marked DONE | I | I | I | I | I | **R/A** | I |

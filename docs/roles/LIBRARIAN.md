@@ -139,7 +139,7 @@ The short trigger/4-step summary lives in `.claude/rules/change-request-protocol
 
 **Before the story's design is approved:** the gap is fixed inside the story, or the story that owns it is named in the story file. Do not log it as debt.
 
-**After the design is approved:** file a CHG-### and decide it under the Change Request protocol above. Add a row to the Technical Debt Ledger only as an index of open CHG ids: `| CHG-### | Story | Severity | Status |`.
+**After the design is approved:** file a CHG-### and decide it under the Change Request protocol above. Add a row to the Technical Debt Ledger only as an index of open CHG ids: `| CHG-### | Story | Severity | Status |`. The one exception is a `[FAST-TRACK]` row (see Fast-Track Change Management above), which records a resolved cosmetic decision, not a gap.
 
 **Tier A (security, financial, legal or compliance, hard to reverse):** report to the Project Owner at once. No role may mark it non-blocking.
 

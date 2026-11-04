@@ -13,4 +13,4 @@ For all other work, execute and report the outcome.
 
 ## Flag Debt Outside Current Scope
 
-If you notice a standards violation that isn't part of the current task, don't silently drop it and don't derail the current task to fix it — note it in chat and/or the PR description as you finish. Full triage and Technical Debt Ledger logging is a Librarian-invocation action, but noticing and surfacing it is universal — it shouldn't depend on Librarian being loaded in the session.
+If you notice a standards violation that isn't part of the current task, don't silently drop it and don't derail the current task to fix it — tell the owner in chat in the same message, and in the PR description. Never log it silently. Before the story's design is approved, fix it inside the story or name the story that owns it. After design approval it becomes a CHG-### (see `docs/roles/LIBRARIAN.md`, Gap Handling Protocol). Tier A gaps (security, financial, legal or compliance, hard to reverse) go to the owner at once. Noticing and surfacing it is universal — it shouldn't depend on Librarian being loaded in the session.

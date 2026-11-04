@@ -181,12 +181,17 @@ export function evaluateEvidence({ story, report, hashesOnDisk, requirements, so
  */
 export function coverageProblems({ storyText, config }) {
   const text = storyText ?? "";
-  const design = /^## Architect Design[^\n]*\n([\s\S]*?)(?=^## |(?![\s\S]))/m.exec(text)?.[1] ?? "";
-  const states = [...new Set([...design.matchAll(/state:([a-z0-9-]+)/g)].map((m) => `state:${m[1]}`))];
-  const shots = config?.shots ?? [];
-  const covered = new Set(shots.flatMap((s) => s.covers ?? []));
+  const section = (heading) =>
+    new RegExp("^#{2,3} " + heading + "[^\\n]*\\n([\\s\\S]*?)(?=^#{2,3} |(?![\\s\\S]))", "m").exec(text)?.[1];
+  const design = section("Architect Design") ?? "";
+  const states = [...new Set([...design.matchAll(/state:([A-Za-z0-9_-]+)/g)].map((m) => `state:${m[1]}`))];
+  const covered = new Set((config?.shots ?? []).flatMap((s) => s.covers ?? []));
   if (states.length === 0 && covered.size === 0) return [];
-  const acCount = (text.match(/^\s*Scenario(?: Outline)?:/gm) ?? []).length;
+  if (text.trim() === "") {
+    return ["visual-checks.json declares covers but no story document was found, so what the shots must cover cannot be checked."];
+  }
+  const acText = section("Acceptance Criteria") ?? text;
+  const acCount = (acText.match(/^\s*Scenario(?: Outline)?:/gm) ?? []).length;
   const required = [...Array.from({ length: acCount }, (_, i) => `AC${i + 1}`), ...states];
   return required
     .filter((id) => !covered.has(id))

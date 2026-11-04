@@ -6,6 +6,7 @@
 
 **Applied notes:**
 - Change 4: the coverage check is enforced when the story's Architect Design names a `state:<name>` or any shot declares `covers`. Stories with neither (US-001) are left alone, so `--all` stays green. 6 new tests, 35 of 35 pass.
+- Review round 1 (KICK_BACK, 2026-11-04) fixes, all applied: `REVIEWER.md` Test Coverage gate reworded; `change-request-protocol.md`, `workflow.md`, `RACI_Design_Flow.md` and the `[FAST-TRACK]` exception in `LIBRARIAN.md` aligned; US-001 story annotated with CHG-001 to CHG-004 (owner approved the edit). The coverage check now reads `###` headings and state names with underscores or capitals, counts ACs only inside the Acceptance Criteria section, and fails when covers are declared but no story document exists. 5 more tests, 40 of 40 pass. `Sprint_Log.md` line 20 is an append-only historical entry and is left as written.
 - Change 6: the "Zero paths means the guard is silent" check was added to the AIOS-side `/sprint-run` skill, outside this repo.
 **Related:** CHG-001 to CHG-006, INF-001
 
@@ -64,16 +65,16 @@ Replace the "Technical Debt Logging Protocol" section with:
 Add to the Verification Checklist:
 
 > - [ ] No untracked gaps: every gap named in the story, design, review or evidence notes has a CHG-### id or was fixed
-> - [ ] No open CHG-### on this story with a status of OPEN
+> - [ ] No CHG-### on this story has a status of OPEN
 
-LIBRARIAN refuses DONE if either box cannot be checked.
+LIBRARIAN refuses DONE if either unchecked box cannot be checked.
 
 ### 3. `docs/roles/ARCHITECT.md`
 
 Add under Core Rules:
 
-> - **No "known gaps" section.** A gap found during design is closed in the design, or sent to the owner as a decision if it changes ACs (CHG-###). Any Tier A gap (security, financial, legal or compliance, hard to reverse) goes to the owner before the design is signed. ARCHITECT never marks it non-blocking.
-> - **Name every UI state.** The Frontend section lists every screen and state the design needs, including error, empty, expired and denied states. HFD's `visual-checks.json` must cover each (see HFD change below).
+> - **No "known gaps" section.** A gap found during design is closed in the design. If closing it changes the ACs, escalate to LIBRARIAN as a CHG-###. Any Tier A gap (security, financial, legal or compliance, hard to reverse) goes to the owner before the design is signed. ARCHITECT never marks it non-blocking.
+> - **Name every UI state.** The Frontend section lists every screen and state the design needs, including error, empty, expired and denied states, as bullets of the form `state:<name>`. HFD's `visual-checks.json` must cover each one.
 
 ### 4. `docs/roles/HUMAN_FACTORS_DESIGNER.md` and `scripts/visual-check/`
 
@@ -127,6 +128,10 @@ docs/roles/ARCHITECT.md
 docs/roles/HUMAN_FACTORS_DESIGNER.md
 docs/roles/CODER.md
 docs/standards/Definition_of_Done.md
+.claude/rules/change-request-protocol.md
+.claude/rules/workflow.md
+docs/project/RACI_Design_Flow.md
+docs/project/stories/US-001-user-login-rbac.md
 scripts/visual-check/check-visual-evidence.mjs
 scripts/visual-check/check-visual-evidence.test.mjs
 scripts/visual-check/lib.mjs

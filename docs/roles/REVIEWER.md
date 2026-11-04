@@ -10,7 +10,7 @@
 * ❌ **E2E/Test Failure:** Any required test suite has failures or was skipped.
 * ❌ **Unmeasurable target:** a coverage or metric target that cannot be measured in this run (tool missing, report not produced) is a fail, not a note.
 * ❌ **Complexity:** CI already auto-rejects (build failure) any method whose complexity/coverage signal exceeds the configured threshold — that's the mechanical floor, not this checklist's bar.
-* ❌ **Test Coverage:** CI already auto-rejects (build failure) below the 65% branch coverage floor. 80% remains the target: treat the range between floor and target as a judgment call (approve with a technical-debt note, or request more tests) rather than an automatic reject.
+* ❌ **Test Coverage:** CI already auto-rejects (build failure) below the 65% branch coverage floor. 80% remains the target: treat the range between floor and target as a judgment call (approve with a filed CHG-### for the shortfall, or request more tests) rather than an automatic reject.
 * ❌ **Platform Integrity Violation (all work, not phase-gated):** Same domain logic implemented in multiple services or classes. Single source of truth must be enforced.
 * ❌ **New Endpoint Without Overlap Check:** Any new endpoint in the PR must be checked against the story map and existing endpoints for a capability match — run the same check from CODER.md's Endpoint/Capability Overlap Check yourself; don't just trust CODER ran it.
 * ❌ **CI Status Not Verified:** Local test runs are NOT a substitute for actual CI status. REVIEWER must confirm the real CI pipeline is green, not just local runs, before issuing PASS.
