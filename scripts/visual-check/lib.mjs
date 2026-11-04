@@ -182,17 +182,26 @@ export function evaluateEvidence({ story, report, hashesOnDisk, requirements, so
 export function coverageProblems({ storyText, config }) {
   const text = storyText ?? "";
   // A section runs to the next heading of the same or a higher level, so `###` subsections belong to it (INF-004).
+  // Lines inside ``` fences are never headings (a Gherkin "# comment" must not end a section), and the
+  // heading text must match exactly, with only an optional "(...)" suffix, so "Architect Designs" is not it.
+  let inFence = false;
+  const lines = text.split(/\r?\n/).map((line) => {
+    if (/^\s*```/.test(line)) {
+      inFence = !inFence;
+      return { line, heading: null };
+    }
+    const m = inFence ? null : /^(#+) (.*)$/.exec(line);
+    return { line, heading: m ? { level: m[1].length, title: m[2] } : null };
+  });
   const section = (heading) => {
-    const lines = text.split(/\r?\n/);
-    const opener = new RegExp("^(#{2,3}) " + heading);
-    const start = lines.findIndex((l) => opener.test(l));
+    const exact = new RegExp("^" + heading + "(?:\\s*\\(.*\\))?\\s*$");
+    const start = lines.findIndex((l) => l.heading && l.heading.level >= 2 && l.heading.level <= 3 && exact.test(l.heading.title));
     if (start === -1) return undefined;
-    const level = opener.exec(lines[start])[1].length;
+    const level = lines[start].heading.level;
     const body = [];
     for (const l of lines.slice(start + 1)) {
-      const m = /^(#+) /.exec(l);
-      if (m && m[1].length <= level) break;
-      body.push(l);
+      if (l.heading && l.heading.level <= level) break;
+      body.push(l.line);
     }
     return body.join("\n");
   };

@@ -328,6 +328,25 @@ test("coverageProblems reads states under ### subsections of ## Architect Design
   assert.deepEqual(problems.map((p) => /covers (\S+?)\.\s/.exec(p)[1]), ["state:session-expired", "state:in-later-subsection"]);
 });
 
+// INF-004 REVIEWER round 1: headings inside fenced blocks are not headings; heading match is exact.
+test("coverageProblems ignores a '# comment' line inside a fenced block", () => {
+  const story = "## Acceptance Criteria\n```gherkin\nScenario: One\n# a comment\nScenario: Two\n```\n## Architect Design\n```gherkin\n# note\n```\n- state:x\n";
+  const problems = coverageProblems({ storyText: story, config: { shots: [{ name: "a", covers: ["AC1"] }] } });
+  assert.deepEqual(problems.map((p) => /covers (\S+?)\.\s/.exec(p)[1]), ["AC2", "state:x"]);
+});
+
+test("coverageProblems ignores a '## heading' line inside a fenced block", () => {
+  const story = "## Acceptance Criteria\n```gherkin\nScenario: One\n## fake\nScenario: Two\n```\n## Architect Design\n```\n## fake\n```\n- state:x\n";
+  const problems = coverageProblems({ storyText: story, config: { shots: [{ name: "a", covers: ["AC1"] }] } });
+  assert.deepEqual(problems.map((p) => /covers (\S+?)\.\s/.exec(p)[1]), ["AC2", "state:x"]);
+});
+
+test("coverageProblems matches the heading exactly, not by prefix", () => {
+  const story = "## Acceptance Criteria\n```gherkin\nScenario: One\n```\n## Architect Designs\n- state:y\n## Architect Design (ARCHITECT, 2026-11-03)\n- state:x\n## Files in Scope\n";
+  const problems = coverageProblems({ storyText: story, config: { shots: [{ name: "a", covers: ["AC1"] }] } });
+  assert.deepEqual(problems.map((p) => /covers (\S+?)\.\s/.exec(p)[1]), ["state:x"]);
+});
+
 test("coverageProblems fails loudly when covers are declared but the story text is empty", () => {
   const problems = coverageProblems({ storyText: "", config: { shots: [{ name: "a", covers: ["AC1"] }] } });
   assert.equal(problems.length, 1);

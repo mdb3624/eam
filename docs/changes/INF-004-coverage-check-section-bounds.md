@@ -13,10 +13,12 @@
 
 A section now runs to the next heading of the same or a higher level, so `###` subsections belong to their `##` parent. A `###`-level "Architect Design" still ends at the next `###`.
 
+Review round 1 (KICK_BACK, 2026-11-04) found three more faults in the same function, all fixed here: a `# comment` line inside a fenced block ended the section (a regression from the first cut), a `## ` line inside a fenced block ended it (older), and the heading match was by prefix so `## Architect Designs` could be read instead (older). Headings inside ``` fences are now ignored and the heading text must match exactly, with only an optional `(...)` suffix. One test each, all red first.
+
 ## Verification
 
-- Red first: the new test `coverageProblems reads states under ### subsections of ## Architect Design` failed with `actual: []`.
-- `node --test scripts/visual-check/*.test.mjs`: 41 of 41 pass.
+- Red first: the new test `coverageProblems reads states under ### subsections of ## Architect Design` failed with `actual: []`. Round 1 added three tests that failed before the fix.
+- `node --test scripts/visual-check/*.test.mjs`: 44 of 44 pass.
 - `check-visual-evidence.mjs --all` green; `scripts/scope-guard/test.sh` 14 of 14.
 - Control on the real US-002 story and `visual-checks.json` (from the US-002 branch): no problems. With the session-expired shots removed, it names `state:session-expired`.
 
