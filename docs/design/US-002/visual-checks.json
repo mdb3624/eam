@@ -1,0 +1,393 @@
+{
+  "_comment": "HFD-authored visual evidence plan for US-002. Run: node scripts/visual-check/capture.mjs --story US-002 --base http://localhost:5273 --token operator=<jwt> --token norole=<jwt> --token expired=<expired jwt>. Fixtures TX-4587 and TX-NOLOC are listed in asset-search-and-360.md. Interactive states use steps (fill/click by data-testid).",
+  "themeStorageKey": "eam.theme",
+  "tokenStorageKey": "eam.token",
+  "tokenStorage": "sessionStorage",
+  "loginPath": "/login",
+  "requirements": {
+    "desktopMinWidth": 1024,
+    "mobileMaxWidth": 480,
+    "themes": [
+      "dark",
+      "light"
+    ]
+  },
+  "shots": [
+    {
+      "name": "search-idle-desktop-dark",
+      "path": "/assets",
+      "width": 1280,
+      "height": 800,
+      "theme": "dark",
+      "token": "operator",
+      "expectText": "Asset search",
+      "covers": [
+        "state:search-idle"
+      ]
+    },
+    {
+      "name": "search-idle-desktop-light",
+      "path": "/assets",
+      "width": 1280,
+      "height": 800,
+      "theme": "light",
+      "token": "operator",
+      "expectText": "Asset search",
+      "covers": [
+        "state:search-idle"
+      ]
+    },
+    {
+      "name": "search-idle-mobile-dark",
+      "path": "/assets",
+      "width": 390,
+      "height": 800,
+      "theme": "dark",
+      "token": "operator",
+      "expectText": "Asset search",
+      "covers": [
+        "state:search-idle"
+      ]
+    },
+    {
+      "name": "search-idle-mobile-light",
+      "path": "/assets",
+      "width": 390,
+      "height": 800,
+      "theme": "light",
+      "token": "operator",
+      "expectText": "Asset search",
+      "covers": [
+        "state:search-idle"
+      ]
+    },
+    {
+      "name": "search-blank-desktop-dark",
+      "path": "/assets",
+      "width": 1280,
+      "height": 800,
+      "theme": "dark",
+      "token": "operator",
+      "expectText": "Enter an Asset ID.",
+      "steps": [
+        {
+          "click": "asset-search-submit"
+        }
+      ],
+      "covers": [
+        "state:search-blank-blocked"
+      ]
+    },
+    {
+      "name": "search-blank-mobile-light",
+      "path": "/assets",
+      "width": 390,
+      "height": 800,
+      "theme": "light",
+      "token": "operator",
+      "expectText": "Enter an Asset ID.",
+      "steps": [
+        {
+          "click": "asset-search-submit"
+        }
+      ],
+      "covers": [
+        "state:search-blank-blocked"
+      ]
+    },
+    {
+      "name": "search-no-match-desktop-dark",
+      "path": "/assets",
+      "width": 1280,
+      "height": 800,
+      "theme": "dark",
+      "token": "operator",
+      "expectText": "No matching asset for",
+      "steps": [
+        {
+          "fill": "asset-search-input",
+          "value": "TX-9999"
+        },
+        {
+          "click": "asset-search-submit"
+        }
+      ],
+      "covers": [
+        "AC3",
+        "state:search-no-match"
+      ]
+    },
+    {
+      "name": "search-no-match-desktop-light",
+      "path": "/assets",
+      "width": 1280,
+      "height": 800,
+      "theme": "light",
+      "token": "operator",
+      "expectText": "No matching asset for",
+      "steps": [
+        {
+          "fill": "asset-search-input",
+          "value": "TX-9999"
+        },
+        {
+          "click": "asset-search-submit"
+        }
+      ],
+      "covers": [
+        "AC3",
+        "state:search-no-match"
+      ]
+    },
+    {
+      "name": "search-no-match-mobile-dark",
+      "path": "/assets",
+      "width": 390,
+      "height": 800,
+      "theme": "dark",
+      "token": "operator",
+      "expectText": "No matching asset for",
+      "steps": [
+        {
+          "fill": "asset-search-input",
+          "value": "TX-9999"
+        },
+        {
+          "click": "asset-search-submit"
+        }
+      ],
+      "covers": [
+        "AC3",
+        "state:search-no-match"
+      ]
+    },
+    {
+      "name": "search-no-match-mobile-light",
+      "path": "/assets",
+      "width": 390,
+      "height": 800,
+      "theme": "light",
+      "token": "operator",
+      "expectText": "No matching asset for",
+      "steps": [
+        {
+          "fill": "asset-search-input",
+          "value": "TX-9999"
+        },
+        {
+          "click": "asset-search-submit"
+        }
+      ],
+      "covers": [
+        "AC3",
+        "state:search-no-match"
+      ]
+    },
+    {
+      "name": "asset-360-desktop-dark",
+      "path": "/assets",
+      "width": 1280,
+      "height": 800,
+      "theme": "dark",
+      "token": "operator",
+      "expectText": "Hierarchy",
+      "steps": [
+        {
+          "fill": "asset-search-input",
+          "value": "TX-4587"
+        },
+        {
+          "click": "asset-search-submit"
+        }
+      ],
+      "covers": [
+        "AC1",
+        "AC2",
+        "state:asset-loaded"
+      ]
+    },
+    {
+      "name": "asset-360-desktop-light",
+      "path": "/assets",
+      "width": 1280,
+      "height": 800,
+      "theme": "light",
+      "token": "operator",
+      "expectText": "Hierarchy",
+      "steps": [
+        {
+          "fill": "asset-search-input",
+          "value": "TX-4587"
+        },
+        {
+          "click": "asset-search-submit"
+        }
+      ],
+      "covers": [
+        "AC1",
+        "AC2",
+        "state:asset-loaded"
+      ]
+    },
+    {
+      "name": "asset-360-mobile-dark",
+      "path": "/assets",
+      "width": 390,
+      "height": 800,
+      "theme": "dark",
+      "token": "operator",
+      "expectText": "Hierarchy",
+      "steps": [
+        {
+          "fill": "asset-search-input",
+          "value": "TX-4587"
+        },
+        {
+          "click": "asset-search-submit"
+        }
+      ],
+      "covers": [
+        "AC1",
+        "AC2",
+        "state:asset-loaded"
+      ]
+    },
+    {
+      "name": "asset-360-mobile-light",
+      "path": "/assets",
+      "width": 390,
+      "height": 800,
+      "theme": "light",
+      "token": "operator",
+      "expectText": "Hierarchy",
+      "steps": [
+        {
+          "fill": "asset-search-input",
+          "value": "TX-4587"
+        },
+        {
+          "click": "asset-search-submit"
+        }
+      ],
+      "covers": [
+        "AC1",
+        "AC2",
+        "state:asset-loaded"
+      ]
+    },
+    {
+      "name": "asset-no-location-desktop-dark",
+      "path": "/assets",
+      "width": 1280,
+      "height": 800,
+      "theme": "dark",
+      "token": "operator",
+      "expectText": "Not recorded",
+      "steps": [
+        {
+          "fill": "asset-search-input",
+          "value": "TX-NOLOC"
+        },
+        {
+          "click": "asset-search-submit"
+        }
+      ],
+      "covers": [
+        "state:location-not-recorded"
+      ]
+    },
+    {
+      "name": "asset-no-location-mobile-light",
+      "path": "/assets",
+      "width": 390,
+      "height": 800,
+      "theme": "light",
+      "token": "operator",
+      "expectText": "Not recorded",
+      "steps": [
+        {
+          "fill": "asset-search-input",
+          "value": "TX-NOLOC"
+        },
+        {
+          "click": "asset-search-submit"
+        }
+      ],
+      "covers": [
+        "state:location-not-recorded"
+      ]
+    },
+    {
+      "name": "asset-not-found-desktop-dark",
+      "path": "/assets/00000000-0000-0000-0000-000000000000",
+      "width": 1280,
+      "height": 800,
+      "theme": "dark",
+      "token": "operator",
+      "expectText": "Asset not found",
+      "covers": [
+        "state:asset-not-found"
+      ]
+    },
+    {
+      "name": "asset-not-found-mobile-light",
+      "path": "/assets/00000000-0000-0000-0000-000000000000",
+      "width": 390,
+      "height": 800,
+      "theme": "light",
+      "token": "operator",
+      "expectText": "Asset not found",
+      "covers": [
+        "state:asset-not-found"
+      ]
+    },
+    {
+      "name": "access-denied-desktop-dark",
+      "path": "/assets",
+      "width": 1280,
+      "height": 800,
+      "theme": "dark",
+      "token": "norole",
+      "expectText": "You do not have access to this screen.",
+      "covers": [
+        "state:access-denied"
+      ]
+    },
+    {
+      "name": "access-denied-mobile-light",
+      "path": "/assets",
+      "width": 390,
+      "height": 800,
+      "theme": "light",
+      "token": "norole",
+      "expectText": "You do not have access to this screen.",
+      "covers": [
+        "state:access-denied"
+      ]
+    },
+    {
+      "name": "session-expired-desktop-dark",
+      "path": "/assets/00000000-0000-0000-0000-000000000000",
+      "width": 1280,
+      "height": 800,
+      "theme": "dark",
+      "token": "expired",
+      "expectText": "Your session expired. Sign in again.",
+      "covers": [
+        "state:session-expired"
+      ]
+    },
+    {
+      "name": "session-expired-mobile-light",
+      "path": "/assets/00000000-0000-0000-0000-000000000000",
+      "width": 390,
+      "height": 800,
+      "theme": "light",
+      "token": "expired",
+      "expectText": "Your session expired. Sign in again.",
+      "covers": [
+        "state:session-expired"
+      ]
+    }
+  ]
+}

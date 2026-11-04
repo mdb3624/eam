@@ -166,6 +166,16 @@ One migration, `V20261103_0900__Create_assets.sql`. It starts with `CREATE EXTEN
 - Screens: asset search, reachable from a nav item for every role with access; Asset 360 at `/assets/:id` with header (Asset ID, name, status, criticality, location), details (manufacturer, model, serial), and the hierarchy path.
 - The Asset 360 tabs from the BRD (map, alarms, incidents, work, timeline) are out of scope here. Each arrives with its own story.
 - Empty and error states: no match, asset not found (404), loading, session expiry (existing US-001 handling).
+- Named states HFD must design and capture (one `state:<name>` each):
+  - `state:search-idle` search page before any input
+  - `state:search-blank-blocked` submit with an empty box shows "Enter an Asset ID."
+  - `state:search-no-match` search returned `[]` (AC 3)
+  - `state:asset-loaded` Asset 360 with header, details and hierarchy (AC 1, AC 2)
+  - `state:asset-not-found` `/assets/:id` returned 404 `ASSET_NOT_FOUND`
+  - `state:location-not-recorded` asset with a null location
+  - `state:access-denied` user with no role (403)
+  - `state:session-expired` expired token redirects to login with the existing banner
+- Loading and unexpected-failure (network, 5xx) reuse the existing `Loading` component and the shared `ApiRequestError` message from US-001. They are covered by component tests, not as separate named states, because a screenshot cannot hold a transient state or force a server failure.
 - Missing optional values display as "Not recorded", never blank.
 - Location displays as latitude and longitude to 5 decimal places (about 1 m). No map in this story; the map pin is US-007.
 
