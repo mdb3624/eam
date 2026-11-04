@@ -17,6 +17,9 @@ Implement features based on validated story AC + ARCHITECT design (+ HFD UI spec
 - [ ] Foreign key constraints reference unique columns only
 - [ ] Any multi-tenancy/soft-delete pattern this project uses is specified
 
+**Scope:**
+- [ ] If the work needs a harness, hook, role-doc or standards edit that is not in Files in Scope, stop. File an INF-### first, then edit. The scope guard flags the edit if you do not.
+
 **From HFD, if this story has a UI component:**
 - [ ] Field Contract Table sign-off chain complete for the story's scope (if this project uses one)
 - [ ] Any conflict between the wireframe and the HFD guidelines is flagged as a **Design Ambiguity Blocker** before coding begins

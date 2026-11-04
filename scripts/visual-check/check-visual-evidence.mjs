@@ -6,10 +6,10 @@
 // Exit 1 and print what is wrong when evidence is missing, wrong, stale or unreviewed.
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { existsSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { evaluateEvidence, isUiScope, levelForStatus, parseGateLog } from "./lib.mjs";
+import { coverageProblems, evaluateEvidence, isUiScope, levelForStatus, parseGateLog } from "./lib.mjs";
 
 export const DEFAULT_REQUIREMENTS = { desktopMinWidth: 1024, mobileMaxWidth: 480, themes: ["dark", "light"] };
 
@@ -43,7 +43,11 @@ export function checkStory({ root, story, level, sourceChangedAt }) {
   }
   const config = readJson(join(root, "docs/design", story, "visual-checks.json"));
   const gatePath = join(root, "docs/project/gate_log.csv");
-  return evaluateEvidence({
+  const storyFile = existsSync(join(root, "docs/project/stories"))
+    ? readdirSync(join(root, "docs/project/stories")).find((f) => f.startsWith(`${story}-`) && f.endsWith(".md"))
+    : null;
+  const storyText = storyFile ? readFileSync(join(root, "docs/project/stories", storyFile), "utf8") : "";
+  const result = evaluateEvidence({
     story,
     report,
     hashesOnDisk,
@@ -52,6 +56,7 @@ export function checkStory({ root, story, level, sourceChangedAt }) {
     gateRows: existsSync(gatePath) ? parseGateLog(readFileSync(gatePath, "utf8")) : [],
     level,
   });
+  return { problems: [...result.problems, ...coverageProblems({ storyText, config })] };
 }
 
 const MAP_ROW = /^\|\s*(US-\d+)\s*\|.*\|\s*([A-Z_]+)\s*\|\s*([A-Z_]+)\s*\|\s*$/;

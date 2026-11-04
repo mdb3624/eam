@@ -10,6 +10,7 @@ import {
   parseGateLog,
   detectGatedTransitions,
   evaluateEvidence,
+  coverageProblems,
 } from "./lib.mjs";
 
 const SHA = "a".repeat(64);
@@ -227,4 +228,86 @@ test("detectGatedTransitions ignores unrelated files", () => {
     detectGatedTransitions({ relPath: "frontend/src/App.tsx", text: "**Status:** DONE", existingDoc: null }),
     [],
   );
+});
+
+// INF-002: HFD's visual-checks.json must cover every AC and every ARCHITECT frontend state.
+const STORY_WITH_STATES = [
+  "## Acceptance Criteria (Gherkin)",
+  "```gherkin",
+  "Scenario: One",
+  "Scenario: Two",
+  "```",
+  "## Architect Design",
+  "- state:no-match",
+  "- state:session-expired",
+  "## Files in Scope",
+  "state:not-a-state-after-design-section",
+].join("\n");
+
+test("coverageProblems names every AC and architect state no shot covers", () => {
+  const config = { shots: [{ name: "a", covers: ["AC1", "state:no-match"] }] };
+  const problems = coverageProblems({ storyText: STORY_WITH_STATES, config });
+  assert.deepEqual(problems.map((p) => /covers (\S+?)\./.exec(p)[1]), ["AC2", "state:session-expired"]);
+});
+
+test("coverageProblems passes when every AC and state is covered", () => {
+  const config = {
+    shots: [
+      { name: "a", covers: ["AC1", "AC2"] },
+      { name: "b", covers: ["state:no-match", "state:session-expired"] },
+    ],
+  };
+  assert.deepEqual(coverageProblems({ storyText: STORY_WITH_STATES, config }), []);
+});
+
+test("coverageProblems is not enforced for a legacy story with no states and no covers", () => {
+  const legacy = "## Acceptance Criteria (Gherkin)\n```gherkin\nScenario: One\n```\n## Architect Design\nno states here\n";
+  assert.deepEqual(coverageProblems({ storyText: legacy, config: { shots: [{ name: "a" }] } }), []);
+});
+
+test("coverageProblems enforces once any shot declares covers, even with no state tokens", () => {
+  const legacy = "```gherkin\nScenario: One\nScenario: Two\n```\n";
+  const problems = coverageProblems({ storyText: legacy, config: { shots: [{ name: "a", covers: ["AC1"] }] } });
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /AC2/);
+});
+
+test("coverageProblems with no visual-checks.json fails when states exist", () => {
+  const problems = coverageProblems({ storyText: STORY_WITH_STATES, config: null });
+  assert.equal(problems.length, 4);
+});
+
+// INF-002 REVIEWER findings: strict, loud edge cases.
+test("coverageProblems reads state names with underscores and capitals in full", () => {
+  const story = "```gherkin\nScenario: One\n```\n## Architect Design\n- state:session_expired\n- state:Empty\n## Files in Scope\n";
+  const problems = coverageProblems({ storyText: story, config: { shots: [{ name: "a", covers: ["AC1"] }] } });
+  assert.deepEqual(problems.map((p) => /covers (\S+?)\.\s/.exec(p)[1]), ["state:session_expired", "state:Empty"]);
+});
+
+test("coverageProblems reads a ### Architect Design heading", () => {
+  const story = "```gherkin\nScenario: One\n```\n### Architect Design\n- state:no-match\n## Files in Scope\n";
+  const problems = coverageProblems({ storyText: story, config: { shots: [{ name: "a", covers: ["AC1"] }] } });
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /state:no-match/);
+});
+
+test("coverageProblems counts ACs only inside the Acceptance Criteria section", () => {
+  const story = [
+    "## Acceptance Criteria (Gherkin)",
+    "```gherkin",
+    "Scenario: One",
+    "```",
+    "## Coder Evidence",
+    "Scenario: a note, not an AC",
+    "## Architect Design",
+    "- state:x",
+  ].join("\n");
+  const problems = coverageProblems({ storyText: story, config: { shots: [{ name: "a", covers: ["AC1", "state:x"] }] } });
+  assert.deepEqual(problems, []);
+});
+
+test("coverageProblems fails loudly when covers are declared but the story text is empty", () => {
+  const problems = coverageProblems({ storyText: "", config: { shots: [{ name: "a", covers: ["AC1"] }] } });
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /story document/);
 });

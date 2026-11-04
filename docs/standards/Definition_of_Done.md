@@ -4,6 +4,7 @@ All features must pass these gates before being marked "DONE".
 ## 💻 Coding Gate
 - Coverage clears the 65% CI floor (unit tests included); 80% is the target beyond the floor.
 - Follows this project's data-layer conventions (see `.claude/rules/`).
+- Any change to a file under `.claude/hooks/` ships with a test under `scripts/<hook-name>/test.sh` that passes on the new hook and fails on the previous one.
 
 ## 🛡️ Security Gate
 - No sensitive data (PII/secrets) in logs.
@@ -20,6 +21,11 @@ Before marking any story DONE, all automated test suites must be green:
 - **Frontend e2e tests (if applicable):** 0 failures. Any UI feature touched by the story must have a corresponding golden-path test before sign-off.
 
 A story cannot be marked DONE if any suite has a failing test.
+
+**Unmeasurable is a fail.** If backend or frontend coverage cannot be produced in the run, the gate fails. CI publishes both reports.
+
+## 🧾 No Debt Gate
+Before DONE: every gap found for the story is fixed or has a CHG-### id, and no CHG for this story is OPEN. Gaps are never recorded as "known" or "carried".
 
 ## 🖥️ Integration Smoke Test Gate
 Before marking any story DONE, the developer must verify the golden path end-to-end in a running dev environment:
