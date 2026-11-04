@@ -17,11 +17,13 @@ Review round 1 (KICK_BACK, 2026-11-04) found three more faults in the same funct
 
 Review round 2 (KICK_BACK, 2026-11-04) found the function could still pass silently, all fixed here: `~~~` fences were not tracked; a fence closed on any line starting with three backticks instead of the same character and at least the same length; an unclosed fence before the Architect Design heading hid it and produced zero states; and an unreadable Architect Design heading (`## Architect Design ##`, `##Architect Design`) did the same. Now: both fence kinds are tracked with CommonMark closing rules, ATX closing hashes are accepted, an unclosed fence is a reported problem, and `state:` tokens with no readable Architect Design heading are a reported problem. The function is a small line scanner, not a full markdown parser. Any remaining silent case found in review means switching to a real parser, decided by the owner.
 
+Review round 3 (KICK_BACK, 2026-11-04) found no silent pass on a realistic story but five exotic silent cases, all fixed here: a commented-out `## Architect Design` hid the real one (HTML comments are now blanked); a second Architect Design section was ignored (all matching sections now count); `- Scenario:`, `> Scenario:`, `**Scenario:**` and `Example:` counted as zero ACs; `state: name` with a space was not read; and a malformed `visual-checks.json` (`shots` not an array, a null shot, `covers` not an array of strings) or a non-string story text crashed or was silently accepted (now reported as problem lines). Round 4 is the last patch round: a further silent miss on a realistic story means the owner decides on a real markdown parser.
+
 ## Verification
 
 - Red first: the new test `coverageProblems reads states under ### subsections of ## Architect Design` failed with `actual: []`. Round 1 added three tests that failed before the fix.
-- Round 2 added 7 tests, all red first.
-- `node --test scripts/visual-check/*.test.mjs`: 51 of 51 pass.
+- Round 2 added 7 tests and round 3 added 6, all red first.
+- `node --test scripts/visual-check/*.test.mjs`: 57 of 57 pass.
 - `check-visual-evidence.mjs --all` green; `scripts/scope-guard/test.sh` 14 of 14.
 - Control on the real US-002 story and `visual-checks.json` (from the US-002 branch): no problems. With the session-expired shots removed, it names `state:session-expired`.
 

@@ -392,6 +392,42 @@ test("state tokens with no readable Architect Design heading are a problem, not 
   assert.match(problems[0], /Architect Design heading/);
 });
 
+// INF-004 REVIEWER round 3: exotic but silent cases, plus a shape guard for hand-written visual-checks.json.
+test("an Architect Design heading inside an HTML comment does not hide the real one", () => {
+  const story = "```gherkin\nScenario: One\n```\n<!--\n## Architect Design\n- state:old\n-->\n## Architect Design\n- state:foo\n";
+  assert.deepEqual(ids(coverageProblems({ storyText: story, config: covers1 })), ["state:foo"]);
+});
+
+test("every Architect Design section counts, not only the first", () => {
+  const story = "```gherkin\nScenario: One\n```\n## Architect Design\n- state:a\n## Notes\ntext\n## Architect Design (addendum)\n- state:b\n";
+  assert.deepEqual(ids(coverageProblems({ storyText: story, config: covers1 })), ["state:a", "state:b"]);
+});
+
+test("bulleted, quoted, bold and Example: scenario lines are counted as ACs", () => {
+  const story = "## Acceptance Criteria\n```gherkin\nScenario: One\n```\n- Scenario: Two\n> Scenario: Three\n**Scenario:** Four\nExample: Five\nExamples:\n  | a |\n";
+  assert.deepEqual(ids(coverageProblems({ storyText: story, config: covers1 })), ["AC2", "AC3", "AC4", "AC5"]);
+});
+
+test("'state: name' with a space is read as a state", () => {
+  const story = "```gherkin\nScenario: One\n```\n## Architect Design\n- state: spaced\n";
+  assert.deepEqual(ids(coverageProblems({ storyText: story, config: covers1 })), ["state:spaced"]);
+});
+
+test("a malformed visual-checks.json is reported, not thrown", () => {
+  const story = "```gherkin\nScenario: One\n```\n";
+  const shape = (config) => coverageProblems({ storyText: story, config });
+  assert.match(shape({ shots: "nope" })[0], /shots/);
+  assert.match(shape({ shots: [null] })[0], /shot #1/);
+  assert.match(shape({ shots: [{ name: "a", covers: "AC1" }] })[0], /covers/);
+  assert.match(shape({ shots: [{ name: "a", covers: [1] }] })[0], /covers/);
+});
+
+test("a non-string story text is treated as no story document, not thrown", () => {
+  const problems = coverageProblems({ storyText: 42, config: covers1 });
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /story document/);
+});
+
 test("coverageProblems fails loudly when covers are declared but the story text is empty", () => {
   const problems = coverageProblems({ storyText: "", config: { shots: [{ name: "a", covers: ["AC1"] }] } });
   assert.equal(problems.length, 1);

@@ -180,7 +180,23 @@ export function evaluateEvidence({ story, report, hashesOnDisk, requirements, so
  * design names a state or any shot declares `covers`; older stories with neither are left alone.
  */
 export function coverageProblems({ storyText, config }) {
-  const text = storyText ?? "";
+  const shapeProblems = [];
+  if (config != null) {
+    if (config.shots !== undefined && !Array.isArray(config.shots)) {
+      shapeProblems.push("visual-checks.json: `shots` must be an array.");
+    } else {
+      (config.shots ?? []).forEach((shot, i) => {
+        if (shot === null || typeof shot !== "object" || Array.isArray(shot)) {
+          shapeProblems.push(`visual-checks.json: shot #${i + 1} must be an object.`);
+        } else if (shot.covers !== undefined && !(Array.isArray(shot.covers) && shot.covers.every((c) => typeof c === "string"))) {
+          shapeProblems.push(`visual-checks.json: shot #${i + 1} (${shot.name ?? "unnamed"}): \`covers\` must be an array of strings.`);
+        }
+      });
+    }
+  }
+  if (shapeProblems.length > 0) return shapeProblems;
+  // HTML comments are blanked (newlines kept) so a commented-out heading or state is never read.
+  const text = (typeof storyText === "string" ? storyText : "").replace(/<!--[\s\S]*?-->/g, (m) => m.replace(/[^\n]/g, ""));
   // A section runs to the next heading of the same or a higher level, so `###` subsections belong to it (INF-004).
   // Lines inside code fences are never headings (a Gherkin "# comment" must not end a section). A fence is
   // ``` or ~~~ (up to 3 spaces of indent) and closes only on the same character, at least as long, with
@@ -203,21 +219,24 @@ export function coverageProblems({ storyText, config }) {
   const unclosedFence = fence !== null;
   const section = (heading) => {
     const exact = new RegExp("^" + heading + "(?:\\s*\\(.*\\))?\\s*$");
-    const start = lines.findIndex((l) => l.heading && l.heading.level >= 2 && l.heading.level <= 3 && exact.test(l.heading.title));
-    if (start === -1) return undefined;
-    const level = lines[start].heading.level;
-    const body = [];
-    for (const l of lines.slice(start + 1)) {
-      if (l.heading && l.heading.level <= level) break;
-      body.push(l.line);
-    }
-    return body.join("\n");
+    // Every matching heading counts (an addendum section adds to the first), bodies are joined.
+    const bodies = [];
+    lines.forEach((l, start) => {
+      if (!(l.heading && l.heading.level >= 2 && l.heading.level <= 3 && exact.test(l.heading.title))) return;
+      const body = [];
+      for (const next of lines.slice(start + 1)) {
+        if (next.heading && next.heading.level <= l.heading.level) break;
+        body.push(next.line);
+      }
+      bodies.push(body.join("\n"));
+    });
+    return bodies.length === 0 ? undefined : bodies.join("\n");
   };
   const designSection = section("Architect Design");
   const design = designSection ?? "";
-  const states = [...new Set([...design.matchAll(/state:([A-Za-z0-9_-]+)/g)].map((m) => `state:${m[1]}`))];
+  const states = [...new Set([...design.matchAll(/state:[ \t]*([A-Za-z0-9_-]+)/g)].map((m) => `state:${m[1]}`))];
   const covered = new Set((config?.shots ?? []).flatMap((s) => s.covers ?? []));
-  const unreadableDesign = designSection === undefined && /state:[A-Za-z0-9_-]+/.test(text);
+  const unreadableDesign = designSection === undefined && /state:[ \t]*[A-Za-z0-9_-]+/.test(text);
   if (states.length === 0 && covered.size === 0 && !unreadableDesign) return [];
   if (text.trim() === "") {
     return ["visual-checks.json declares covers but no story document was found, so what the shots must cover cannot be checked."];
@@ -229,7 +248,7 @@ export function coverageProblems({ storyText, config }) {
     return ["The story names state: tokens but no Architect Design heading (## or ###) could be read, so the required states cannot be checked."];
   }
   const acText = section("Acceptance Criteria") ?? text;
-  const acCount = (acText.match(/^\s*Scenario(?: Outline)?:/gm) ?? []).length;
+  const acCount = (acText.match(/^[ \t]*(?:[-*>][ \t]*)*(?:\*\*)?(?:Scenario Outline|Scenario|Example)(?::\*\*|:)/gm) ?? []).length;
   const required = [...Array.from({ length: acCount }, (_, i) => `AC${i + 1}`), ...states];
   return required
     .filter((id) => !covered.has(id))
