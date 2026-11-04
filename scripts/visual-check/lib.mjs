@@ -182,17 +182,25 @@ export function evaluateEvidence({ story, report, hashesOnDisk, requirements, so
 export function coverageProblems({ storyText, config }) {
   const text = storyText ?? "";
   // A section runs to the next heading of the same or a higher level, so `###` subsections belong to it (INF-004).
-  // Lines inside ``` fences are never headings (a Gherkin "# comment" must not end a section), and the
-  // heading text must match exactly, with only an optional "(...)" suffix, so "Architect Designs" is not it.
-  let inFence = false;
+  // Lines inside code fences are never headings (a Gherkin "# comment" must not end a section). A fence is
+  // ``` or ~~~ (up to 3 spaces of indent) and closes only on the same character, at least as long, with
+  // nothing after it. The heading text must match exactly, with only an optional "(...)" suffix, so
+  // "Architect Designs" is not it. A fence still open at the end is reported, never silently accepted.
+  let fence = null;
   const lines = text.split(/\r?\n/).map((line) => {
-    if (/^\s*```/.test(line)) {
-      inFence = !inFence;
+    const f = /^ {0,3}(`{3,}|~{3,})(.*)$/.exec(line);
+    if (fence) {
+      if (f && f[1][0] === fence.char && f[1].length >= fence.len && f[2].trim() === "") fence = null;
       return { line, heading: null };
     }
-    const m = inFence ? null : /^(#+) (.*)$/.exec(line);
+    if (f && !(f[1][0] === "`" && f[2].includes("`"))) {
+      fence = { char: f[1][0], len: f[1].length };
+      return { line, heading: null };
+    }
+    const m = /^(#+)[ \t]+(.*?)(?:[ \t]+#+)?[ \t]*$/.exec(line);
     return { line, heading: m ? { level: m[1].length, title: m[2] } : null };
   });
+  const unclosedFence = fence !== null;
   const section = (heading) => {
     const exact = new RegExp("^" + heading + "(?:\\s*\\(.*\\))?\\s*$");
     const start = lines.findIndex((l) => l.heading && l.heading.level >= 2 && l.heading.level <= 3 && exact.test(l.heading.title));
@@ -205,12 +213,20 @@ export function coverageProblems({ storyText, config }) {
     }
     return body.join("\n");
   };
-  const design = section("Architect Design") ?? "";
+  const designSection = section("Architect Design");
+  const design = designSection ?? "";
   const states = [...new Set([...design.matchAll(/state:([A-Za-z0-9_-]+)/g)].map((m) => `state:${m[1]}`))];
   const covered = new Set((config?.shots ?? []).flatMap((s) => s.covers ?? []));
-  if (states.length === 0 && covered.size === 0) return [];
+  const unreadableDesign = designSection === undefined && /state:[A-Za-z0-9_-]+/.test(text);
+  if (states.length === 0 && covered.size === 0 && !unreadableDesign) return [];
   if (text.trim() === "") {
     return ["visual-checks.json declares covers but no story document was found, so what the shots must cover cannot be checked."];
+  }
+  if (unclosedFence) {
+    return ["The story has an unclosed code fence, so its headings cannot be read reliably. Close the fence."];
+  }
+  if (unreadableDesign) {
+    return ["The story names state: tokens but no Architect Design heading (## or ###) could be read, so the required states cannot be checked."];
   }
   const acText = section("Acceptance Criteria") ?? text;
   const acCount = (acText.match(/^\s*Scenario(?: Outline)?:/gm) ?? []).length;

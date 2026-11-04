@@ -347,6 +347,51 @@ test("coverageProblems matches the heading exactly, not by prefix", () => {
   assert.deepEqual(problems.map((p) => /covers (\S+?)\.\s/.exec(p)[1]), ["state:x"]);
 });
 
+// INF-004 REVIEWER round 2: no silent pass. Unclosed fences and unreadable headings are problems.
+const covers1 = { shots: [{ name: "a", covers: ["AC1"] }] };
+const ids = (problems) => problems.map((p) => /covers (\S+?)\.\s/.exec(p)?.[1] ?? p);
+
+test("an unclosed fence before the Architect Design heading is a problem, not a silent pass", () => {
+  const story = "## Acceptance Criteria\n```gherkin\nScenario: One\n## Architect Design\n- state:a\n";
+  const problems = coverageProblems({ storyText: story, config: covers1 });
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /unclosed code fence/);
+});
+
+test("an unclosed fence after the Architect Design heading is also a problem", () => {
+  const story = "```gherkin\nScenario: One\n```\n## Architect Design\n- state:a\n```\ntext\n";
+  const problems = coverageProblems({ storyText: story, config: covers1 });
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /unclosed code fence/);
+});
+
+test("headings inside a ~~~ fence are ignored", () => {
+  const story = "```gherkin\nScenario: One\n```\n## Architect Design\n~~~\n# x\n## y\n~~~\n- state:a\n";
+  assert.deepEqual(ids(coverageProblems({ storyText: story, config: covers1 })), ["state:a"]);
+});
+
+test("a fence closes only on the same character and at least the same length", () => {
+  const story = "```gherkin\nScenario: One\n```\n## Architect Design\n````\n```\n## x\n```\n````\n- state:a\n";
+  assert.deepEqual(ids(coverageProblems({ storyText: story, config: covers1 })), ["state:a"]);
+});
+
+test("a fence line with an info string does not close a fence", () => {
+  const story = "```gherkin\nScenario: One\n```\n## Architect Design\n```\n```js\n## x\n```\n- state:a\n";
+  assert.deepEqual(ids(coverageProblems({ storyText: story, config: covers1 })), ["state:a"]);
+});
+
+test("an ATX heading with closing hashes is recognised", () => {
+  const story = "```gherkin\nScenario: One\n```\n## Architect Design ##\n- state:a\n";
+  assert.deepEqual(ids(coverageProblems({ storyText: story, config: covers1 })), ["state:a"]);
+});
+
+test("state tokens with no readable Architect Design heading are a problem, not zero states", () => {
+  const story = "```gherkin\nScenario: One\n```\n##Architect Design\n- state:a\n";
+  const problems = coverageProblems({ storyText: story, config: covers1 });
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /Architect Design heading/);
+});
+
 test("coverageProblems fails loudly when covers are declared but the story text is empty", () => {
   const problems = coverageProblems({ storyText: "", config: { shots: [{ name: "a", covers: ["AC1"] }] } });
   assert.equal(problems.length, 1);
