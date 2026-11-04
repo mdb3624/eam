@@ -8,6 +8,12 @@
 - `Example:` at the start of a line inside Acceptance Criteria prose adds a phantom AC.
 - Capitalised `State:` is not read (the ARCHITECT.md convention is lowercase `state:<name>`).
 - Many unterminated `<!--` on one line take over a second per 40,000 occurrences.
+- Found in review round 5, also absent from every real story:
+  - An HTML comment opened in prose and closed many lines later hides everything between, including real states, with no problem. A line scanner cannot tell this from a deliberate comment, and CommonMark treats it the same way.
+  - `<!--` inside inline code (`` `<!--` ``) opens a comment and reports "unclosed HTML comment" (loud false positive).
+  - `<!-->` is a complete comment in CommonMark but is scanned as an open one, so a later `-->` hides the states between with no problem.
+  - The state name pattern is ASCII only: `state:één` is not read, `state:one/two` is cut to `state:one`, and a trailing hyphen is kept in the name.
+  - The space form `state: name` is read only after a `-` or `*` bullet, so `1. state: one`, a table cell and `**state:** one` are not read. The documented form is `state:<name>`.
 **Technical Blocker:** None. Each case fails loudly or is unreachable in real stories, so the Visual Evidence Gate is not weakened.
 
 **Options:**
