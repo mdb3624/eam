@@ -223,7 +223,7 @@ docs/standards/style-guide.md
 - REVIEWER: KICK_BACK (CI not verifiable) then PASS after CI run 40553689502 went green. VISUAL PASS, 14 shots. See `docs/project/gate_log.csv`.
 - AC 1, 2, 3 and the disabled-account edge case pass. The session-expiry edge case is partial: the "without losing unsaved field-form data" clause is not implemented. Carried to US-019.
 - Scope drift recorded in `Sprint_Log.md` (2026-10-27). Owner to choose scope amendment or INF ticket.
-- Debt: frontend coverage unmeasured (`@vitest/coverage-v8` missing); no session-expired screenshot; scope-guard hook wrote no `CODER_SCOPE` rows for out-of-scope files.
+- Gaps found at review, now tracked: frontend coverage unmeasured (`@vitest/coverage-v8` missing) is CHG-001; no session-expired screenshot is CHG-002; the scope-guard hook writing no `CODER_SCOPE` rows was a parser bug, fixed by INF-001 (the guard's warn-mode default is CHG-005).
 
 ## Librarian Sign-Off: US-001 (User Login and Role-Based Access)
 

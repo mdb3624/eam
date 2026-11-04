@@ -130,6 +130,7 @@ docs/roles/CODER.md
 docs/standards/Definition_of_Done.md
 .claude/rules/change-request-protocol.md
 .claude/rules/workflow.md
+ARCHITECTURE.md
 docs/project/RACI_Design_Flow.md
 docs/project/stories/US-001-user-login-rbac.md
 scripts/visual-check/check-visual-evidence.mjs
