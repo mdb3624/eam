@@ -83,3 +83,18 @@ test("custom requirements from the HFD visual-checks.json are honoured", () => {
   const { problems } = checkStory({ root, story: "US-001", level: 1, sourceChangedAt: null });
   assert.ok(problems.some((p) => /high-contrast/.test(p)));
 });
+
+test("checkStory fails when the story design names a state no shot covers (INF-002)", () => {
+  const root = repo();
+  writeFileSync(
+    join(root, "docs/project/stories/US-001-login.md"),
+    "**Scope:** FULL_STACK\n```gherkin\nScenario: One\n```\n## Architect Design\n- state:session-expired\n## Files in Scope\n",
+  );
+  mkdirSync(join(root, "docs/design/US-001"), { recursive: true });
+  writeFileSync(
+    join(root, "docs/design/US-001/visual-checks.json"),
+    JSON.stringify({ shots: [{ name: "d-dark", covers: ["AC1"] }] }),
+  );
+  const { problems } = checkStory({ root, story: "US-001", level: 1, sourceChangedAt: null });
+  assert.ok(problems.some((p) => /state:session-expired/.test(p)), problems.join("\n"));
+});

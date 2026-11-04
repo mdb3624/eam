@@ -58,6 +58,7 @@ Use this checklist for every UI story before declaring `READY_FOR_CODER`:
 - [ ] Accessibility verified (contrast ratios, ARIA labels, keyboard nav)
 - [ ] Field Contract Table reviewed (every UI field → API param → DB column), if applicable
 - [ ] `docs/design/<ID>/visual-checks.json` authored: every screen and state, phone and desktop width, every theme, and `expectText` unique to the correct screen (it is how the capture proves a shot is not the login page or an error page). CODER and REVIEWER are gated on this.
+- [ ] Every shot has a `covers` array naming what it shows: AC ids (`"AC3"`) and ARCHITECT frontend states (`"state:session-expired"`). Every AC and every `state:<name>` in the story's Architect Design must appear in some `covers`; `check-visual-evidence.mjs` fails otherwise.
 
 ## ⚠️ Anti-Patterns (Forbidden)
 

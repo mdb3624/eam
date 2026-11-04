@@ -40,6 +40,10 @@ When marking a story "DONE", append a `## Librarian Sign-Off` section directly t
 - [x] Coverage clears the 65% CI floor (80% target, not the enforced minimum)
 - [x] All ACs implemented and tested
 - [x] Traceability links verified
+- [ ] No untracked gaps: every gap named in the story, design, review or evidence notes has a CHG-### id or was fixed
+- [ ] No CHG-### on this story has a status of OPEN
+
+LIBRARIAN refuses DONE if either unchecked box cannot be checked.
 
 ## Test Results
 
@@ -129,10 +133,14 @@ The short trigger/4-step summary lives in `.claude/rules/change-request-protocol
 - Report to the Project Owner when a CHG originates from a Tier A (financial/legal/compliance/hard-to-reverse) ambiguity, and when a story is signed off DONE.
 - CODER making backward requests (instead of escalating) = code review failure.
 
-## Technical Debt Logging Protocol
+## Gap Handling Protocol
 
-**Trigger:** Whenever a file is read or code is proposed that violates a standards file in `.claude/rules/` or `docs/standards/`.
+**Trigger:** a role finds a gap, a standards violation, or code that breaks a rule in `.claude/rules/` or `docs/standards/`.
 
-**Mandatory action:** Before providing the final answer, append a new row to the Technical Debt Ledger tagged `[DEBT:AUTO]`: `| Feature/File | Violation | Severity | Remediation Plan |`.
+**Before the story's design is approved:** the gap is fixed inside the story, or the story that owns it is named in the story file. Do not log it as debt.
 
-**Conflict resolution:** If you're ~95% sure you found debt but aren't working on that specific feature, log it silently in the background and continue with the current task — don't derail the active story to chase it.
+**After the design is approved:** file a CHG-### and decide it under the Change Request protocol above. Add a row to the Technical Debt Ledger only as an index of open CHG ids: `| CHG-### | Story | Severity | Status |`.
+
+**Tier A (security, financial, legal or compliance, hard to reverse):** report to the Project Owner at once. No role may mark it non-blocking.
+
+A gap outside the current task is surfaced to the owner in the same message. It is never logged silently.

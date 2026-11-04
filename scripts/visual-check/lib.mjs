@@ -173,3 +173,22 @@ export function evaluateEvidence({ story, report, hashesOnDisk, requirements, so
   }
   return { problems };
 }
+
+/**
+ * INF-002: every AC and every ARCHITECT frontend state (`state:<name>` inside "## Architect Design")
+ * must appear in some shot's `covers` in docs/design/<ID>/visual-checks.json. Enforced when the
+ * design names a state or any shot declares `covers`; older stories with neither are left alone.
+ */
+export function coverageProblems({ storyText, config }) {
+  const text = storyText ?? "";
+  const design = /^## Architect Design[^\n]*\n([\s\S]*?)(?=^## |(?![\s\S]))/m.exec(text)?.[1] ?? "";
+  const states = [...new Set([...design.matchAll(/state:([a-z0-9-]+)/g)].map((m) => `state:${m[1]}`))];
+  const shots = config?.shots ?? [];
+  const covered = new Set(shots.flatMap((s) => s.covers ?? []));
+  if (states.length === 0 && covered.size === 0) return [];
+  const acCount = (text.match(/^\s*Scenario(?: Outline)?:/gm) ?? []).length;
+  const required = [...Array.from({ length: acCount }, (_, i) => `AC${i + 1}`), ...states];
+  return required
+    .filter((id) => !covered.has(id))
+    .map((id) => `visual-checks.json: no shot covers ${id}. Add it to a shot's "covers" or capture the missing state.`);
+}
