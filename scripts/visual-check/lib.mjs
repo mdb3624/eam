@@ -195,15 +195,36 @@ export function coverageProblems({ storyText, config }) {
     }
   }
   if (shapeProblems.length > 0) return shapeProblems;
-  // HTML comments are blanked (newlines kept) so a commented-out heading or state is never read.
-  const text = (typeof storyText === "string" ? storyText : "").replace(/<!--[\s\S]*?-->/g, (m) => m.replace(/[^\n]/g, ""));
+  const raw = typeof storyText === "string" ? storyText : "";
   // A section runs to the next heading of the same or a higher level, so `###` subsections belong to it (INF-004).
   // Lines inside code fences are never headings (a Gherkin "# comment" must not end a section). A fence is
   // ``` or ~~~ (up to 3 spaces of indent) and closes only on the same character, at least as long, with
   // nothing after it. The heading text must match exactly, with only an optional "(...)" suffix, so
   // "Architect Designs" is not it. A fence still open at the end is reported, never silently accepted.
+  // HTML comments are blanked outside fences only (a "<!--" shown inside a fence is just text), so a
+  // commented-out heading or state is never read; a comment still open at the end is reported.
   let fence = null;
-  const lines = text.split(/\r?\n/).map((line) => {
+  let inComment = false;
+  const lines = raw.split(/\r?\n/).map((original) => {
+    let line = original;
+    if (!fence) {
+      let out = "";
+      let rest = line;
+      for (;;) {
+        if (inComment) {
+          const end = rest.indexOf("-->");
+          if (end === -1) { rest = ""; break; }
+          rest = rest.slice(end + 3);
+          inComment = false;
+        }
+        const start = rest.indexOf("<!--");
+        if (start === -1) break;
+        out += rest.slice(0, start);
+        rest = rest.slice(start + 4);
+        inComment = true;
+      }
+      line = out + rest;
+    }
     const f = /^ {0,3}(`{3,}|~{3,})(.*)$/.exec(line);
     if (fence) {
       if (f && f[1][0] === fence.char && f[1].length >= fence.len && f[2].trim() === "") fence = null;
@@ -217,6 +238,15 @@ export function coverageProblems({ storyText, config }) {
     return { line, heading: m ? { level: m[1].length, title: m[2] } : null };
   });
   const unclosedFence = fence !== null;
+  const unclosedComment = inComment;
+  const text = lines.map((l) => l.line).join("\n");
+  // `state:name` (word boundary, dots allowed inside a name) anywhere; `state: name` with a space only
+  // as a bullet, so prose like "the session state: unknown" is not a required state.
+  const NAME = "[A-Za-z0-9_-]+(?:\\.[A-Za-z0-9_-]+)*";
+  const stateTokens = (s) => [
+    ...[...s.matchAll(new RegExp("(?<![A-Za-z0-9_])state:(" + NAME + ")", "g"))].map((m) => m[1]),
+    ...[...s.matchAll(new RegExp("^[ \\t]*[-*][ \\t]+state:[ \\t]+(" + NAME + ")", "gm"))].map((m) => m[1]),
+  ];
   const section = (heading) => {
     const exact = new RegExp("^" + heading + "(?:\\s*\\(.*\\))?\\s*$");
     // Every matching heading counts (an addendum section adds to the first), bodies are joined.
@@ -234,21 +264,28 @@ export function coverageProblems({ storyText, config }) {
   };
   const designSection = section("Architect Design");
   const design = designSection ?? "";
-  const states = [...new Set([...design.matchAll(/state:[ \t]*([A-Za-z0-9_-]+)/g)].map((m) => `state:${m[1]}`))];
+  const states = [...new Set(stateTokens(design).map((n) => `state:${n}`))];
   const covered = new Set((config?.shots ?? []).flatMap((s) => s.covers ?? []));
-  const unreadableDesign = designSection === undefined && /state:[ \t]*[A-Za-z0-9_-]+/.test(text);
+  const unreadableDesign = designSection === undefined && stateTokens(text).length > 0;
   if (states.length === 0 && covered.size === 0 && !unreadableDesign) return [];
-  if (text.trim() === "") {
+  if (raw.trim() === "") {
     return ["visual-checks.json declares covers but no story document was found, so what the shots must cover cannot be checked."];
   }
   if (unclosedFence) {
     return ["The story has an unclosed code fence, so its headings cannot be read reliably. Close the fence."];
   }
+  if (unclosedComment) {
+    return ["The story has an unclosed HTML comment, so everything after it is hidden. Close the comment with -->."];
+  }
   if (unreadableDesign) {
     return ["The story names state: tokens but no Architect Design heading (## or ###) could be read, so the required states cannot be checked."];
   }
-  const acText = section("Acceptance Criteria") ?? text;
+  const acSection = section("Acceptance Criteria");
+  const acText = acSection ?? text;
   const acCount = (acText.match(/^[ \t]*(?:[-*>][ \t]*)*(?:\*\*)?(?:Scenario Outline|Scenario|Example)(?::\*\*|:)/gm) ?? []).length;
+  if (acSection !== undefined && acCount === 0) {
+    return ["The story has an Acceptance Criteria section but no scenario could be read from it (expected lines like `Scenario: ...`), so the ACs cannot be checked."];
+  }
   const required = [...Array.from({ length: acCount }, (_, i) => `AC${i + 1}`), ...states];
   return required
     .filter((id) => !covered.has(id))

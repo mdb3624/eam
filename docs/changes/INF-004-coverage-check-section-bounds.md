@@ -19,17 +19,20 @@ Review round 2 (KICK_BACK, 2026-11-04) found the function could still pass silen
 
 Review round 3 (KICK_BACK, 2026-11-04) found no silent pass on a realistic story but five exotic silent cases, all fixed here: a commented-out `## Architect Design` hid the real one (HTML comments are now blanked); a second Architect Design section was ignored (all matching sections now count); `- Scenario:`, `> Scenario:`, `**Scenario:**` and `Example:` counted as zero ACs; `state: name` with a space was not read; and a malformed `visual-checks.json` (`shots` not an array, a null shot, `covers` not an array of strings) or a non-string story text crashed or was silently accepted (now reported as problem lines). Round 4 is the last patch round: a further silent miss on a realistic story means the owner decides on a real markdown parser.
 
+Review round 4 (KICK_BACK, 2026-11-04) found no silent miss and no false positive on any real story (all 44 story files on this branch and the US-002 branch gave AC counts equal to a plain `Scenario:` count) but listed gaps with no CHG. Fixed here: a `<!--` inside a code fence swallowed the fence close and later states (comments are now blanked outside fences only); an unclosed HTML comment is now a reported problem; an Acceptance Criteria section that yields zero readable scenarios is now a reported problem, so any unlisted scenario spelling fails loudly; `state:` needs a word boundary, dots stay in names, and `state: name` with a space is read only as a bullet so prose is not a state. Capitalised `State:` stays unread by design (ARCHITECT.md uses lowercase). The remaining loud over-reports and the slow pathological input are filed as CHG-007, owned by LIBRARIAN.
+
 ## Verification
 
 - Red first: the new test `coverageProblems reads states under ### subsections of ## Architect Design` failed with `actual: []`. Round 1 added three tests that failed before the fix.
-- Round 2 added 7 tests and round 3 added 6, all red first.
-- `node --test scripts/visual-check/*.test.mjs`: 57 of 57 pass.
+- Round 2 added 7 tests, round 3 added 6 and round 4 added 5, all red first.
+- `node --test scripts/visual-check/*.test.mjs`: 62 of 62 pass.
 - `check-visual-evidence.mjs --all` green; `scripts/scope-guard/test.sh` 14 of 14.
 - Control on the real US-002 story and `visual-checks.json` (from the US-002 branch): no problems. With the session-expired shots removed, it names `state:session-expired`.
 
 ## Files in Scope
 
 docs/changes/INF-004-coverage-check-section-bounds.md
+docs/changes/CHG-007-coverage-check-loud-over-reports.md
 scripts/visual-check/lib.mjs
 scripts/visual-check/lib.test.mjs
 docs/project/Sprint_Log.md

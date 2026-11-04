@@ -428,6 +428,36 @@ test("a non-string story text is treated as no story document, not thrown", () =
   assert.match(problems[0], /story document/);
 });
 
+// INF-004 REVIEWER round 4: comments never swallow fences, zero ACs and unclosed comments are loud, strict state tokens.
+test("a '<!--' inside a code fence does not swallow the fence close and later states", () => {
+  const story = "## Acceptance Criteria\n```gherkin\nScenario: One\n```\n## Architect Design\n```\n<!-- note\n```\n- state:a\nsome --> prose\n";
+  assert.deepEqual(ids(coverageProblems({ storyText: story, config: covers1 })), ["state:a"]);
+});
+
+test("an unclosed HTML comment is a problem, not a silent hide", () => {
+  const story = "```gherkin\nScenario: One\n```\n## Architect Design\n- state:a\n<!-- never closed\n";
+  const problems = coverageProblems({ storyText: story, config: covers1 });
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /unclosed HTML comment/);
+});
+
+test("an Acceptance Criteria section with no readable scenario is a problem, whatever the spelling", () => {
+  const story = "## Acceptance Criteria\n1. Scenario: a\n### Scenario: b\n## Architect Design\n- state:a\n";
+  const problems = coverageProblems({ storyText: story, config: { shots: [{ name: "a", covers: ["state:a"] }] } });
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /Acceptance Criteria/);
+});
+
+test("state tokens need a word boundary and keep dots in the name", () => {
+  const story = "```gherkin\nScenario: One\n```\n## Architect Design\n- restate:foo\n- state:search.idle\n- state:end.\n";
+  assert.deepEqual(ids(coverageProblems({ storyText: story, config: covers1 })), ["state:search.idle", "state:end"]);
+});
+
+test("prose containing 'state: word' is not a required state, a bullet is", () => {
+  const story = "```gherkin\nScenario: One\n```\n## Architect Design\nThe session state: unknown is shown.\n- state: real\n";
+  assert.deepEqual(ids(coverageProblems({ storyText: story, config: covers1 })), ["state:real"]);
+});
+
 test("coverageProblems fails loudly when covers are declared but the story text is empty", () => {
   const problems = coverageProblems({ storyText: "", config: { shots: [{ name: "a", covers: ["AC1"] }] } });
   assert.equal(problems.length, 1);
