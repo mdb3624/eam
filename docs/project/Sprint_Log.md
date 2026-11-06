@@ -76,3 +76,8 @@ Owned by LIBRARIAN. Append-only decision/status log.
   1. Visual Evidence Gate red on US-001 staleness. Owner chose option B on 2026-11-06: an INF to scope staleness per story. Not yet filed or applied.
   2. CHG-006 (multi-field asset search, BRD 8.2) is OPEN on this story. LIBRARIAN refuses DONE while a CHG on the story is OPEN. It changes ACs, so the decision is the owner's.
 - **Also needed before DONE:** open the PR and verify the merge state, then sign-off.
+
+## 2026-11-06 - CHG-006 decided: Option A
+
+- **Decision (owner):** ship US-002 as approved. Multi-field asset search (address, feeder, substation, coordinates; BRD 8.2) becomes a new story for the BA to draft, then Gate 1. No story ID yet.
+- **Effect on US-002:** blocker 2 cleared. Remaining before DONE: Visual Evidence Gate fix (INF for per-story staleness, owner approved the design), PR open, merge state verified, sign-off.

@@ -15,5 +15,7 @@
 1. LIBRARIAN decides.
 2. If A, BA drafts the search story and the owner approves its ACs at Gate 1.
 
-**Status:** CHG-006 OPEN (awaiting decision)
+**Decision (2026-11-06, owner Mike Barnes, recorded by LIBRARIAN):** Option A. US-002 ships with its approved ACs. Multi-field search becomes a new story, drafted by the BA once the location column exists (it does after US-002) and approved at Gate 1. Backlog item, no story ID assigned yet.
+
+**Status:** CHG-006 CLOSED (Option A, backlog item)
 **Assign to:** LIBRARIAN
