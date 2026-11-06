@@ -1,6 +1,6 @@
 {
   "story": "US-002",
-  "generatedAt": "2026-11-06T17:03:24Z",
+  "generatedAt": "2026-11-06T17:24:40Z",
   "base": "http://localhost:5273",
   "browser": "chromium 156.0.4314.58",
   "tool": "playwright",
@@ -138,8 +138,8 @@
     {
       "name": "asset-360-desktop-dark",
       "file": "asset-360-desktop-dark.png",
-      "sha256": "56d4da7c9f6734a1316456a24ac62e7d50ee4b22ba4f8128d9c3be42edb7ef6b",
-      "bytes": 53430,
+      "sha256": "72a7abda7163ec85b2818fb8d14d645e3d0240154721a0584fe32e0cebb76dc1",
+      "bytes": 50308,
       "width": 1280,
       "height": 800,
       "theme": "dark",
@@ -151,8 +151,8 @@
     {
       "name": "asset-360-desktop-light",
       "file": "asset-360-desktop-light.png",
-      "sha256": "294dd6f6a43cc5eeb14e1176de030e8c36a3721db88086ad8a2584751ece57c7",
-      "bytes": 51820,
+      "sha256": "a9a445305acc1ebae8e74ad4166ef74b35d11779a31759e15e82d1f756bcd576",
+      "bytes": 48801,
       "width": 1280,
       "height": 800,
       "theme": "light",
@@ -164,8 +164,8 @@
     {
       "name": "asset-360-mobile-dark",
       "file": "asset-360-mobile-dark.png",
-      "sha256": "1fcbde6454e3bf0ec0fb62f459d14b0bfc9ab7295c1683d769855d0ab3c9e1e9",
-      "bytes": 52901,
+      "sha256": "f62e0cd32698bb636d709ede2b3cc4a7902cf1bd74e58335d1e64b42584c0a43",
+      "bytes": 49349,
       "width": 390,
       "height": 1500,
       "theme": "dark",
@@ -177,8 +177,8 @@
     {
       "name": "asset-360-mobile-light",
       "file": "asset-360-mobile-light.png",
-      "sha256": "8a1cbae2d78159c2967c31fa8e9a2350593fb14375bf06e280982d09e0771345",
-      "bytes": 50869,
+      "sha256": "65d8dc5ae5f45ff36bee4fe73f716d03ae9ef2df3d4d64ff1f0e8d955813fb46",
+      "bytes": 47688,
       "width": 390,
       "height": 1500,
       "theme": "light",
@@ -190,8 +190,8 @@
     {
       "name": "asset-no-location-desktop-dark",
       "file": "asset-no-location-desktop-dark.png",
-      "sha256": "15c1a00bb101688e102e862f67b23408637770918577ecead4389fc26f62c18b",
-      "bytes": 53055,
+      "sha256": "3b09f966b1344a35051fd4983313588790d1d6b335e408951a6c04d2c01dc1e7",
+      "bytes": 49930,
       "width": 1280,
       "height": 800,
       "theme": "dark",
@@ -203,8 +203,8 @@
     {
       "name": "asset-no-location-mobile-light",
       "file": "asset-no-location-mobile-light.png",
-      "sha256": "38b0e1b2c218d8901ecaea38f8b76afb0be47fabf9760742a4203afd327a774c",
-      "bytes": 50891,
+      "sha256": "2cfeb0e13f349a6493ad2654d1b5c843a98ee8ae61605897d8c9051e530e5d62",
+      "bytes": 47687,
       "width": 390,
       "height": 1500,
       "theme": "light",
