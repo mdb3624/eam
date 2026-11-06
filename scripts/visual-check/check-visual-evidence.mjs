@@ -33,7 +33,18 @@ export function latestSourceChange(root) {
   return latest ? new Date(latest).toISOString() : null;
 }
 
-export function checkStory({ root, story, level, sourceChangedAt }) {
+/** The story's status from Story_Map.md, or null when the map or the row is missing. */
+function mapStatus(root, story) {
+  const mapPath = join(root, "docs/project/Story_Map.md");
+  if (!existsSync(mapPath)) return null;
+  for (const line of readFileSync(mapPath, "utf8").split(/\r?\n/)) {
+    const m = MAP_ROW.exec(line);
+    if (m && m[1] === story) return m[3];
+  }
+  return null;
+}
+
+export function checkStory({ root, story, level, sourceChangedAt, status = mapStatus(root, story) }) {
   const evidenceDir = join(root, "docs/project/evidence", story);
   const report = readJson(join(evidenceDir, "visual-report.json"));
   const hashesOnDisk = {};
@@ -55,6 +66,7 @@ export function checkStory({ root, story, level, sourceChangedAt }) {
     sourceChangedAt,
     gateRows: existsSync(gatePath) ? parseGateLog(readFileSync(gatePath, "utf8")) : [],
     level,
+    status,
   });
   return { problems: [...result.problems, ...coverageProblems({ storyText, config })] };
 }
@@ -69,7 +81,7 @@ export function checkAll({ root, sourceChangedAt }) {
   for (const line of readFileSync(mapPath, "utf8").split(/\r?\n/)) {
     const m = MAP_ROW.exec(line);
     if (!m || !isUiScope(m[2]) || levelForStatus(m[3]) === 0) continue;
-    const { problems } = checkStory({ root, story: m[1], level: levelForStatus(m[3]), sourceChangedAt });
+    const { problems } = checkStory({ root, story: m[1], level: levelForStatus(m[3]), sourceChangedAt, status: m[3] });
     if (problems.length > 0) failures.push({ story: m[1], status: m[3], problems });
   }
   return failures;
