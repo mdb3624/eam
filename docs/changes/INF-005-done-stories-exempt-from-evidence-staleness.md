@@ -2,7 +2,7 @@
 
 **Type:** Infrastructure / defect in the INF-002 Visual Evidence Gate
 **Raised by:** CODER during US-002 (2026-11-06), design approved by the project owner
-**Status:** APPLIED on branch `chore/INF-005-done-stories-exempt-from-staleness`. Awaiting REVIEWER and merge.
+**Status:** APPLIED and REVIEWER PASS on branch `chore/INF-005-done-stories-exempt-from-staleness`. Awaiting merge. Review mutation checks: removing the exemption fails 3 tests, exempting any non-empty status fails 2. One gap filed as CHG-008 (a Bash edit that flips a story to DONE skips the hook and now also the CI stale check).
 **Related:** INF-002, US-001, US-002
 
 ## Problem
@@ -29,6 +29,7 @@
 ## Files in Scope
 
 docs/changes/INF-005-done-stories-exempt-from-evidence-staleness.md
+docs/changes/CHG-008-done-flip-via-bash-skips-stale-check.md
 scripts/visual-check/lib.mjs
 scripts/visual-check/lib.test.mjs
 scripts/visual-check/check-visual-evidence.mjs
