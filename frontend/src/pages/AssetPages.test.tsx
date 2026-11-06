@@ -153,6 +153,42 @@ describe('Asset pages', () => {
       expect(fetchMock).toHaveBeenCalledWith('/api/v1/assets?assetId=A%26B%20%231', expect.anything())
     })
 
+    it('the no-match banner carries the Error: label like every error banner', async () => {
+      renderAt('/assets', 'OPERATOR', {
+        'GET /api/v1/assets?assetId=NOPE-2': () => jsonResponse(200, []),
+      })
+
+      await search('NOPE-2')
+
+      const banner = await screen.findByTestId('asset-search-no-match')
+      expect(within(banner).getByText('Error:').tagName).toBe('B')
+    })
+
+    it('an Asset ID over 50 characters is rejected in the field with its own message and no request', async () => {
+      const fetchMock = renderAt('/assets')
+      const user = userEvent.setup()
+
+      await user.type(await screen.findByTestId('asset-search-input'), 'X'.repeat(51))
+      await user.click(screen.getByTestId('asset-search-submit'))
+
+      expect(await screen.findByTestId('asset-search-error')).toHaveTextContent(
+        'Asset ID must be 50 characters or fewer.',
+      )
+      expect(fetchMock).toHaveBeenCalledTimes(1) // auth/me only
+    })
+
+    it('an Asset ID of exactly 50 characters is sent', async () => {
+      const id = 'Y'.repeat(50)
+      const fetchMock = renderAt('/assets', 'OPERATOR', {
+        [`GET /api/v1/assets?assetId=${id}`]: () => jsonResponse(200, []),
+      })
+
+      await search(id)
+
+      await screen.findByTestId('asset-search-no-match')
+      expect(fetchMock).toHaveBeenCalledWith(`/api/v1/assets?assetId=${id}`, expect.anything())
+    })
+
     it('AC 3 / state:search-no-match: shows the no-match banner and keeps the page', async () => {
       renderAt('/assets', 'OPERATOR', {
         'GET /api/v1/assets?assetId=NOPE-1': () => jsonResponse(200, []),

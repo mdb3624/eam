@@ -423,10 +423,6 @@ input[aria-invalid='true'] {
   min-width: 0;
 }
 
-.asset-360 {
-  max-width: 880px;
-}
-
 .back-link {
   display: inline-block;
   margin-bottom: var(--s3);

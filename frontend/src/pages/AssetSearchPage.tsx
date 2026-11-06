@@ -5,6 +5,8 @@ import { searchAssets } from '@/api/assets'
 import { useAuth } from '@/auth/AuthContext'
 
 const BLANK_MESSAGE = 'Enter an Asset ID.'
+const TOO_LONG_MESSAGE = 'Asset ID must be 50 characters or fewer.'
+const MAX_LENGTH = 50
 const ERROR_ID = 'asset-search-error-text'
 
 export default function AssetSearchPage() {
@@ -21,6 +23,10 @@ export default function AssetSearchPage() {
     const text = value.trim()
     if (!text) {
       setFieldError(BLANK_MESSAGE)
+      return
+    }
+    if (text.length > MAX_LENGTH) {
+      setFieldError(TOO_LONG_MESSAGE)
       return
     }
     setFieldError(null)
@@ -44,7 +50,7 @@ export default function AssetSearchPage() {
       <p className="muted">Enter an Asset ID to open its record.</p>
       {noMatch && (
         <div className="banner" role="alert" data-testid="asset-search-no-match">
-          {noMatch}
+          <b>Error:</b> {noMatch}
         </div>
       )}
       <form onSubmit={submit} noValidate>

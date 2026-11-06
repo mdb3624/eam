@@ -194,14 +194,11 @@ class MigrationIT extends AbstractPostgresIT {
     void assetTypeStatusAndCriticalityRejectValuesOutsideTheirSets() throws Exception {
         UUID tenantId = UUID.randomUUID();
         TenantSeed.seedTenant(tenantId);
-        UUID substation = AssetSeed.seed(tenantId, "SUB-CHK", "SUBSTATION", null);
-
         assertRejected("assets_asset_type_check", () -> AssetSeed.seed(tenantId, "BAD-T", "WIDGET", null));
         assertRejected("assets_status_check", () -> AssetSeed.seed(
                 new AssetSeed.Spec(tenantId, "BAD-S", "SUBSTATION", null).state("BROKEN", "LOW")));
         assertRejected("assets_criticality_check", () -> AssetSeed.seed(
                 new AssetSeed.Spec(tenantId, "BAD-C", "SUBSTATION", null).state("IN_SERVICE", "EXTREME")));
-        assertThat(substation).isNotNull();
     }
 
     @Test
@@ -271,6 +268,40 @@ class MigrationIT extends AbstractPostgresIT {
             assertThatThrownBy(() -> statement.executeUpdate("DELETE FROM eam.assets"))
                     .isInstanceOf(SQLException.class)
                     .hasMessageContaining("permission denied");
+        }
+    }
+
+    @Test
+    void parentTypeRuleAlsoHoldsOnUpdate() throws Exception {
+        UUID tenantId = UUID.randomUUID();
+        TenantSeed.seedTenant(tenantId);
+        UUID[] chain = AssetSeed.seedChain(tenantId, "-UP");
+
+        try (Connection admin = adminConnection(); Statement statement = admin.createStatement()) {
+            assertThatThrownBy(() -> statement.executeUpdate(
+                    "UPDATE eam.assets SET parent_id = '" + chain[0] + "' WHERE id = '" + chain[2] + "'"))
+                    .isInstanceOf(SQLException.class)
+                    .hasMessageContaining("must be a FEEDER");
+            assertThatThrownBy(() -> statement.executeUpdate(
+                    "UPDATE eam.assets SET asset_type = 'TRANSFORMER' WHERE id = '" + chain[1] + "'"))
+                    .isInstanceOf(SQLException.class)
+                    .hasMessageContaining("must be a FEEDER");
+        }
+    }
+
+    @Test
+    void runtimeCannotInsertAnAssetForAnotherTenant() throws Exception {
+        UUID tenantA = UUID.randomUUID();
+        UUID tenantB = UUID.randomUUID();
+        TenantSeed.seedTenant(tenantA);
+        TenantSeed.seedTenant(tenantB);
+
+        try (Connection runtime = runtimeConnection(tenantA); Statement statement = runtime.createStatement()) {
+            assertThatThrownBy(() -> statement.executeUpdate(
+                    "INSERT INTO eam.assets (id, tenant_id, asset_code, name, asset_type) VALUES ('"
+                            + UUID.randomUUID() + "', '" + tenantB + "', 'XT-1', 'Cross tenant', 'SUBSTATION')"))
+                    .isInstanceOf(SQLException.class)
+                    .hasMessageContaining("row-level security");
         }
     }
 }

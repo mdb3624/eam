@@ -104,7 +104,7 @@ export default function AssetPage() {
   if (view.kind === 'error') {
     return (
       <div className="banner" role="alert">
-        {view.message}
+        <b>Error:</b> {view.message}
       </div>
     )
   }

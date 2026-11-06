@@ -159,7 +159,9 @@ class AssetIT extends AbstractPostgresIT {
 
         fetch(tenantId, chain[2])
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.hierarchy[?(@.assetType == 'FEEDER')]").isEmpty());
+                .andExpect(jsonPath("$.hierarchy.length()").value(2))
+                .andExpect(jsonPath("$.hierarchy[0].assetType").value("UTILITY"))
+                .andExpect(jsonPath("$.hierarchy[1].id").value(chain[2].toString()));
     }
 
     // AC 3
