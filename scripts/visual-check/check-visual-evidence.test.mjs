@@ -110,3 +110,22 @@ test("checkStory reports a missing story document when covers are declared (INF-
   const { problems } = checkStory({ root, story: "US-001", level: 1, sourceChangedAt: null });
   assert.ok(problems.some((p) => /story document/.test(p)), problems.join("\n"));
 });
+
+// INF-005
+test("checkAll does not hold a DONE story to staleness but still requires its evidence", () => {
+  const signed = `2026-10-20T13:00:00Z,US-001,VISUAL,REVIEWER,PASS,,all shots reviewed,
+`;
+  const done = repo({ status: "DONE", gateRows: signed });
+  assert.deepEqual(checkAll({ root: done, sourceChangedAt: "2026-10-21T00:00:00Z" }), []);
+  const inFlight = repo({ status: "CODE_REVIEW" });
+  const stale = checkAll({ root: inFlight, sourceChangedAt: "2026-10-21T00:00:00Z" });
+  assert.ok(stale[0].problems.some((p) => /stale/i.test(p)));
+  const missing = checkAll({ root: repo({ status: "DONE", withEvidence: false }), sourceChangedAt: null });
+  assert.equal(missing.length, 1);
+});
+
+test("checkStory reads the status from the Story_Map when called with --story semantics", () => {
+  const done = repo({ status: "DONE", gateRows: `2026-10-20T13:00:00Z,US-001,VISUAL,REVIEWER,PASS,,all shots reviewed,
+` });
+  assert.deepEqual(checkStory({ root: done, story: "US-001", level: 1, sourceChangedAt: "2026-10-21T00:00:00Z" }).problems, []);
+});

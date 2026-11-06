@@ -140,6 +140,28 @@ test("evidence older than the latest frontend change is stale", () => {
   assert.ok(problems.some((p) => /stale/i.test(p)));
 });
 
+// INF-005: a DONE story's evidence is a record of the UI as shipped, so later frontend changes do
+// not make it stale. Every other check still applies to it.
+test("a DONE story's evidence is not stale after a later frontend change", () => {
+  const { problems } = evaluateEvidence(base({ status: "DONE", sourceChangedAt: "2026-10-20T12:30:00Z" }));
+  assert.deepEqual(problems, []);
+});
+
+test("an in-flight story's evidence is still stale after a later frontend change", () => {
+  for (const status of ["CODE_REVIEW", "REVIEW_PASSED", "LIBRARIAN_VERIFICATION", undefined]) {
+    const { problems } = evaluateEvidence(base({ status, sourceChangedAt: "2026-10-20T12:30:00Z" }));
+    assert.ok(problems.some((p) => /stale/i.test(p)), `status ${status}`);
+  }
+});
+
+test("a DONE story still fails on a missing screenshot, a hash mismatch and a missing phone shot", () => {
+  const onlyDesktop = goodShots().filter((s) => s.width >= 1024);
+  const noPhone = evaluateEvidence(base({ status: "DONE", report: reportOf(onlyDesktop) }));
+  assert.ok(noPhone.problems.some((p) => /phone/.test(p)));
+  const tampered = evaluateEvidence(base({ status: "DONE", hashesOnDisk: { "d-dark.png": "bad" } }));
+  assert.ok(tampered.problems.length > 0);
+});
+
 test("level 2 requires a REVIEWER VISUAL PASS row newer than the evidence", () => {
   const none = evaluateEvidence(base({ level: 2 }));
   assert.ok(none.problems.some((p) => /REVIEWER/.test(p)));

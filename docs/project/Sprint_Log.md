@@ -81,3 +81,9 @@ Owned by LIBRARIAN. Append-only decision/status log.
 
 - **Decision (owner):** ship US-002 as approved. Multi-field asset search (address, feeder, substation, coordinates; BRD 8.2) becomes a new story for the BA to draft, then Gate 1. No story ID yet.
 - **Effect on US-002:** blocker 2 cleared. Remaining before DONE: Visual Evidence Gate fix (INF for per-story staleness, owner approved the design), PR open, merge state verified, sign-off.
+## 2026-11-06 - INF-005 applied: DONE stories exempt from evidence staleness
+
+- **Why:** US-002's nav item staled US-001's DONE evidence, failing the CI gate. Owner chose to fix the gate. The first design (per-story Files in Scope) would not have worked because US-001's scope is `frontend/src/**`; replaced with: a DONE story is not stale-checked.
+- **Applied (pending REVIEWER and merge):** `lib.mjs`, `check-visual-evidence.mjs`, tests (67 of 67), Definition of Done. In-flight stories still stale-checked; DONE stories still need intact, complete, reviewed evidence.
+- **Record:** `docs/changes/INF-005-done-stories-exempt-from-evidence-staleness.md`.
+- **Review:** REVIEWER PASS (separate session), CI green on the branch. Filed CHG-008, OPEN awaiting LIBRARIAN: a Bash `sed` that flips a story to DONE bypasses the hook and now the CI stale check too. Recommendation: CI compares Story_Map at the base ref (option B).
