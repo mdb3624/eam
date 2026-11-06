@@ -306,6 +306,158 @@ test("coverageProblems counts ACs only inside the Acceptance Criteria section", 
   assert.deepEqual(problems, []);
 });
 
+// INF-004: a ## Architect Design holds ### subsections (Schema, API, Frontend); states under them count.
+test("coverageProblems reads states under ### subsections of ## Architect Design", () => {
+  const story = [
+    "## Acceptance Criteria (Gherkin)",
+    "```gherkin",
+    "Scenario: One",
+    "```",
+    "## Architect Design (ARCHITECT, 2026-11-03)",
+    "### Schema",
+    "text",
+    "### Frontend",
+    "- state:search-idle",
+    "- state:session-expired",
+    "### Config wiring",
+    "- state:in-later-subsection",
+    "## Files in Scope",
+    "state:after-design",
+  ].join("\n");
+  const problems = coverageProblems({ storyText: story, config: { shots: [{ name: "a", covers: ["AC1", "state:search-idle"] }] } });
+  assert.deepEqual(problems.map((p) => /covers (\S+?)\.\s/.exec(p)[1]), ["state:session-expired", "state:in-later-subsection"]);
+});
+
+// INF-004 REVIEWER round 1: headings inside fenced blocks are not headings; heading match is exact.
+test("coverageProblems ignores a '# comment' line inside a fenced block", () => {
+  const story = "## Acceptance Criteria\n```gherkin\nScenario: One\n# a comment\nScenario: Two\n```\n## Architect Design\n```gherkin\n# note\n```\n- state:x\n";
+  const problems = coverageProblems({ storyText: story, config: { shots: [{ name: "a", covers: ["AC1"] }] } });
+  assert.deepEqual(problems.map((p) => /covers (\S+?)\.\s/.exec(p)[1]), ["AC2", "state:x"]);
+});
+
+test("coverageProblems ignores a '## heading' line inside a fenced block", () => {
+  const story = "## Acceptance Criteria\n```gherkin\nScenario: One\n## fake\nScenario: Two\n```\n## Architect Design\n```\n## fake\n```\n- state:x\n";
+  const problems = coverageProblems({ storyText: story, config: { shots: [{ name: "a", covers: ["AC1"] }] } });
+  assert.deepEqual(problems.map((p) => /covers (\S+?)\.\s/.exec(p)[1]), ["AC2", "state:x"]);
+});
+
+test("coverageProblems matches the heading exactly, not by prefix", () => {
+  const story = "## Acceptance Criteria\n```gherkin\nScenario: One\n```\n## Architect Designs\n- state:y\n## Architect Design (ARCHITECT, 2026-11-03)\n- state:x\n## Files in Scope\n";
+  const problems = coverageProblems({ storyText: story, config: { shots: [{ name: "a", covers: ["AC1"] }] } });
+  assert.deepEqual(problems.map((p) => /covers (\S+?)\.\s/.exec(p)[1]), ["state:x"]);
+});
+
+// INF-004 REVIEWER round 2: no silent pass. Unclosed fences and unreadable headings are problems.
+const covers1 = { shots: [{ name: "a", covers: ["AC1"] }] };
+const ids = (problems) => problems.map((p) => /covers (\S+?)\.\s/.exec(p)?.[1] ?? p);
+
+test("an unclosed fence before the Architect Design heading is a problem, not a silent pass", () => {
+  const story = "## Acceptance Criteria\n```gherkin\nScenario: One\n## Architect Design\n- state:a\n";
+  const problems = coverageProblems({ storyText: story, config: covers1 });
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /unclosed code fence/);
+});
+
+test("an unclosed fence after the Architect Design heading is also a problem", () => {
+  const story = "```gherkin\nScenario: One\n```\n## Architect Design\n- state:a\n```\ntext\n";
+  const problems = coverageProblems({ storyText: story, config: covers1 });
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /unclosed code fence/);
+});
+
+test("headings inside a ~~~ fence are ignored", () => {
+  const story = "```gherkin\nScenario: One\n```\n## Architect Design\n~~~\n# x\n## y\n~~~\n- state:a\n";
+  assert.deepEqual(ids(coverageProblems({ storyText: story, config: covers1 })), ["state:a"]);
+});
+
+test("a fence closes only on the same character and at least the same length", () => {
+  const story = "```gherkin\nScenario: One\n```\n## Architect Design\n````\n```\n## x\n```\n````\n- state:a\n";
+  assert.deepEqual(ids(coverageProblems({ storyText: story, config: covers1 })), ["state:a"]);
+});
+
+test("a fence line with an info string does not close a fence", () => {
+  const story = "```gherkin\nScenario: One\n```\n## Architect Design\n```\n```js\n## x\n```\n- state:a\n";
+  assert.deepEqual(ids(coverageProblems({ storyText: story, config: covers1 })), ["state:a"]);
+});
+
+test("an ATX heading with closing hashes is recognised", () => {
+  const story = "```gherkin\nScenario: One\n```\n## Architect Design ##\n- state:a\n";
+  assert.deepEqual(ids(coverageProblems({ storyText: story, config: covers1 })), ["state:a"]);
+});
+
+test("state tokens with no readable Architect Design heading are a problem, not zero states", () => {
+  const story = "```gherkin\nScenario: One\n```\n##Architect Design\n- state:a\n";
+  const problems = coverageProblems({ storyText: story, config: covers1 });
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /Architect Design heading/);
+});
+
+// INF-004 REVIEWER round 3: exotic but silent cases, plus a shape guard for hand-written visual-checks.json.
+test("an Architect Design heading inside an HTML comment does not hide the real one", () => {
+  const story = "```gherkin\nScenario: One\n```\n<!--\n## Architect Design\n- state:old\n-->\n## Architect Design\n- state:foo\n";
+  assert.deepEqual(ids(coverageProblems({ storyText: story, config: covers1 })), ["state:foo"]);
+});
+
+test("every Architect Design section counts, not only the first", () => {
+  const story = "```gherkin\nScenario: One\n```\n## Architect Design\n- state:a\n## Notes\ntext\n## Architect Design (addendum)\n- state:b\n";
+  assert.deepEqual(ids(coverageProblems({ storyText: story, config: covers1 })), ["state:a", "state:b"]);
+});
+
+test("bulleted, quoted, bold and Example: scenario lines are counted as ACs", () => {
+  const story = "## Acceptance Criteria\n```gherkin\nScenario: One\n```\n- Scenario: Two\n> Scenario: Three\n**Scenario:** Four\nExample: Five\nExamples:\n  | a |\n";
+  assert.deepEqual(ids(coverageProblems({ storyText: story, config: covers1 })), ["AC2", "AC3", "AC4", "AC5"]);
+});
+
+test("'state: name' with a space is read as a state", () => {
+  const story = "```gherkin\nScenario: One\n```\n## Architect Design\n- state: spaced\n";
+  assert.deepEqual(ids(coverageProblems({ storyText: story, config: covers1 })), ["state:spaced"]);
+});
+
+test("a malformed visual-checks.json is reported, not thrown", () => {
+  const story = "```gherkin\nScenario: One\n```\n";
+  const shape = (config) => coverageProblems({ storyText: story, config });
+  assert.match(shape({ shots: "nope" })[0], /shots/);
+  assert.match(shape({ shots: [null] })[0], /shot #1/);
+  assert.match(shape({ shots: [{ name: "a", covers: "AC1" }] })[0], /covers/);
+  assert.match(shape({ shots: [{ name: "a", covers: [1] }] })[0], /covers/);
+});
+
+test("a non-string story text is treated as no story document, not thrown", () => {
+  const problems = coverageProblems({ storyText: 42, config: covers1 });
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /story document/);
+});
+
+// INF-004 REVIEWER round 4: comments never swallow fences, zero ACs and unclosed comments are loud, strict state tokens.
+test("a '<!--' inside a code fence does not swallow the fence close and later states", () => {
+  const story = "## Acceptance Criteria\n```gherkin\nScenario: One\n```\n## Architect Design\n```\n<!-- note\n```\n- state:a\nsome --> prose\n";
+  assert.deepEqual(ids(coverageProblems({ storyText: story, config: covers1 })), ["state:a"]);
+});
+
+test("an unclosed HTML comment is a problem, not a silent hide", () => {
+  const story = "```gherkin\nScenario: One\n```\n## Architect Design\n- state:a\n<!-- never closed\n";
+  const problems = coverageProblems({ storyText: story, config: covers1 });
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /unclosed HTML comment/);
+});
+
+test("an Acceptance Criteria section with no readable scenario is a problem, whatever the spelling", () => {
+  const story = "## Acceptance Criteria\n1. Scenario: a\n### Scenario: b\n## Architect Design\n- state:a\n";
+  const problems = coverageProblems({ storyText: story, config: { shots: [{ name: "a", covers: ["state:a"] }] } });
+  assert.equal(problems.length, 1);
+  assert.match(problems[0], /Acceptance Criteria/);
+});
+
+test("state tokens need a word boundary and keep dots in the name", () => {
+  const story = "```gherkin\nScenario: One\n```\n## Architect Design\n- restate:foo\n- state:search.idle\n- state:end.\n";
+  assert.deepEqual(ids(coverageProblems({ storyText: story, config: covers1 })), ["state:search.idle", "state:end"]);
+});
+
+test("prose containing 'state: word' is not a required state, a bullet is", () => {
+  const story = "```gherkin\nScenario: One\n```\n## Architect Design\nThe session state: unknown is shown.\n- state: real\n";
+  assert.deepEqual(ids(coverageProblems({ storyText: story, config: covers1 })), ["state:real"]);
+});
+
 test("coverageProblems fails loudly when covers are declared but the story text is empty", () => {
   const problems = coverageProblems({ storyText: "", config: { shots: [{ name: "a", covers: ["AC1"] }] } });
   assert.equal(problems.length, 1);

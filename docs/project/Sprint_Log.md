@@ -58,3 +58,11 @@ Owned by LIBRARIAN. Append-only decision/status log.
 - **Why:** US-001 reached DONE with five known gaps. REVIEWER.md allowed "Approve but flag" and LIBRARIAN.md said to log debt silently. Both are replaced.
 - **INF-002 applied (pending REVIEWER and merge):** REVIEWER, LIBRARIAN, ARCHITECT, HFD, CODER role docs and the Definition of Done. `check-visual-evidence.mjs` now fails when a shot does not cover every AC and every architect `state:`.
 - **Filed, all OPEN awaiting LIBRARIAN decision:** CHG-001 frontend coverage unmeasured; CHG-002 no session-expired screenshot; CHG-003 disabled user keeps a valid token (Tier A); CHG-004 no login rate limiting (Tier A); CHG-005 scope guard in warn mode; CHG-006 US-002 multi-field asset search.
+
+## 2026-11-04 - INF-004 coverage check fixed, CHG-007 filed
+
+- **Defect:** the INF-002 coverage check read the Architect Design section only up to its first `###` subsection, so US-002's `state:` bullets under `### Frontend` were never required. Found by HFD while authoring US-002's `visual-checks.json`.
+- **Fix:** `coverageProblems` now reads sections by heading level and tracks code fences and HTML comments, and it reports a problem instead of passing when it cannot read the story (unclosed fence or comment, no readable Architect Design heading, an Acceptance Criteria section with no scenario, a malformed `visual-checks.json`).
+- **Review:** REVIEWER ran 5 rounds in separate sessions (4 KICK_BACK, then PASS). No silent miss or false positive on any of the 44 real story files. 62 of 62 visual-check tests, `--all` green, scope-guard 14 of 14.
+- **Filed:** CHG-007 (loud over-reports and exotic markdown the line scanner does not handle), OPEN awaiting LIBRARIAN decision. Recommendation: leave as is, revisit with a real markdown parser if another patch round is needed.
+- **Record:** `docs/changes/INF-004-coverage-check-section-bounds.md`.
