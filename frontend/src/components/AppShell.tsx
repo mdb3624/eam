@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '@/auth/AuthContext'
-import { ROLE_CONFIG } from '@/auth/roles'
+import { ASSETS_NAV, ROLE_CONFIG } from '@/auth/roles'
 import { applyTheme, currentTheme, type Theme } from '@/auth/theme'
 import { Logo, NavIcon } from './Icons'
 
@@ -28,10 +28,16 @@ export default function AppShell() {
         </div>
         <nav className="nav" aria-label="Main">
           {role && (
-            <NavLink to={role.home} data-testid={`shell-nav-${role.home.slice(1)}`}>
-              <NavIcon name={role.icon} />
-              {role.navLabel}
-            </NavLink>
+            <>
+              <NavLink to={role.home} data-testid={`shell-nav-${role.home.slice(1)}`}>
+                <NavIcon name={role.icon} />
+                {role.navLabel}
+              </NavLink>
+              <NavLink to={ASSETS_NAV.route} data-testid={`shell-nav-${ASSETS_NAV.route.slice(1)}`}>
+                <NavIcon name={ASSETS_NAV.icon} />
+                {ASSETS_NAV.label}
+              </NavLink>
+            </>
           )}
         </nav>
         <div className="me">

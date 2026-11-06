@@ -4,8 +4,10 @@ import { useAuth } from '@/auth/AuthContext'
 import { ROLES, ROLE_CONFIG, homeFor } from '@/auth/roles'
 import { applyTheme, getStoredTheme } from '@/auth/theme'
 import AppShell from '@/components/AppShell'
+import AssetPage from '@/pages/AssetPage'
+import AssetSearchPage from '@/pages/AssetSearchPage'
 import LoginPage from '@/pages/LoginPage'
-import { AccessDenied, Loading, PlaceholderScreen, RequireRole } from '@/pages/Screens'
+import { AccessDenied, Loading, PlaceholderScreen, RequireAnyRole, RequireRole } from '@/pages/Screens'
 
 function ProtectedLayout() {
   const { status } = useAuth()
@@ -45,6 +47,22 @@ export default function App() {
             }
           />
         ))}
+        <Route
+          path="/assets"
+          element={
+            <RequireAnyRole>
+              <AssetSearchPage />
+            </RequireAnyRole>
+          }
+        />
+        <Route
+          path="/assets/:id"
+          element={
+            <RequireAnyRole>
+              <AssetPage />
+            </RequireAnyRole>
+          }
+        />
         <Route path="*" element={<AccessDenied />} />
       </Route>
     </Routes>

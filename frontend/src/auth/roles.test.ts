@@ -1,5 +1,5 @@
 // Story: US-001. AC 1 (role-appropriate home and navigation).
-import { ROLE_CONFIG, homeFor, isRole } from './roles'
+import { ASSETS_NAV, ROLE_CONFIG, homeFor, isRole } from './roles'
 
 describe('roles', () => {
   it('maps each MVP role to its home route and nav label', () => {
@@ -12,6 +12,11 @@ describe('roles', () => {
       label: 'Maintenance Supervisor',
     })
     expect(ROLE_CONFIG.SYSTEM_ADMIN).toMatchObject({ home: '/admin', navLabel: 'Administration', label: 'System Administrator' })
+  })
+
+  // Story: US-002. Every role gets the Assets nav item.
+  it('defines one Assets nav item for every role', () => {
+    expect(ASSETS_NAV).toEqual({ label: 'Assets', route: '/assets', icon: 'search' })
   })
 
   it('homeFor returns null when there is no role', () => {

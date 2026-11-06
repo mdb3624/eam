@@ -67,6 +67,20 @@ Owned by LIBRARIAN. Append-only decision/status log.
 - **Filed:** CHG-007 (loud over-reports and exotic markdown the line scanner does not handle), OPEN awaiting LIBRARIAN decision. Recommendation: leave as is, revisit with a real markdown parser if another patch round is needed.
 - **Record:** `docs/changes/INF-004-coverage-check-section-bounds.md`.
 
+## 2026-11-06 - US-002 REVIEW_PASSED, in LIBRARIAN_VERIFICATION
+
+- **Shipped on branch** `feature/US-002-canonical-asset-record-search` (pushed, no PR yet): migration `V20261103_0900__Create_assets.sql` (PostGIS, `eam.assets`, RLS, parent-type trigger), `GET /api/v1/assets` and `GET /api/v1/assets/{id}`, Asset search and Asset 360 UI, 22 visual-evidence shots.
+- **Review:** REVIEWER ran 3 rounds in separate sessions. Round 1 KICK_BACK (CI unverified, phone shots cut off, Error label, weak tests, 50-char limit, card width). Round 2 KICK_BACK (test ids on links, raw UUID in shots). Round 3 PASS and VISUAL PASS. All findings were fixed in the story, none carried.
+- **Evidence:** backend `verify` 34 unit and 64 integration tests, 0 failures (AssetIT 22, MigrationIT 20); frontend 81 tests, lint and build clean; visual-check tests 62 of 62; scope-guard 14 of 14. CI run 42261449622: all jobs green except the Visual Evidence Gate, which fails only on US-001 evidence staleness.
+- **Not DONE, two blockers:**
+  1. Visual Evidence Gate red on US-001 staleness. Owner chose option B on 2026-11-06: an INF to scope staleness per story. Not yet filed or applied.
+  2. CHG-006 (multi-field asset search, BRD 8.2) is OPEN on this story. LIBRARIAN refuses DONE while a CHG on the story is OPEN. It changes ACs, so the decision is the owner's.
+- **Also needed before DONE:** open the PR and verify the merge state, then sign-off.
+
+## 2026-11-06 - CHG-006 decided: Option A
+
+- **Decision (owner):** ship US-002 as approved. Multi-field asset search (address, feeder, substation, coordinates; BRD 8.2) becomes a new story for the BA to draft, then Gate 1. No story ID yet.
+- **Effect on US-002:** blocker 2 cleared. Remaining before DONE: Visual Evidence Gate fix (INF for per-story staleness, owner approved the design), PR open, merge state verified, sign-off.
 ## 2026-11-06 - INF-005 applied: DONE stories exempt from evidence staleness
 
 - **Why:** US-002's nav item staled US-001's DONE evidence, failing the CI gate. Owner chose to fix the gate. The first design (per-story Files in Scope) would not have worked because US-001's scope is `frontend/src/**`; replaced with: a DONE story is not stale-checked.

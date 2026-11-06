@@ -1,6 +1,7 @@
 package com.eam.db;
 
 import com.eam.support.AbstractPostgresIT;
+import com.eam.support.AssetSeed;
 import com.eam.support.TenantSeed;
 import org.junit.jupiter.api.Test;
 
@@ -156,6 +157,151 @@ class MigrationIT extends AbstractPostgresIT {
             assertThatThrownBy(() -> statement.executeQuery("SELECT role FROM eam.users"))
                     .isInstanceOf(SQLException.class)
                     .hasMessageContaining("permission denied");
+        }
+    }
+
+    // Story: US-002. Assets: PostGIS, self-referencing hierarchy, DB-enforced rules, RLS.
+
+    private static void assertRejected(String constraint, java.util.concurrent.Callable<?> insert) {
+        assertThatThrownBy(insert::call).isInstanceOf(SQLException.class).hasMessageContaining(constraint);
+    }
+
+    @Test
+    void postgisIsEnabledAndRuntimeCanResolveGeographyFunctions() throws Exception {
+        assertThat(queryBoolean("SELECT EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'postgis')")).isTrue();
+        try (Connection runtime = runtimeConnection(null); Statement statement = runtime.createStatement();
+             ResultSet rs = statement.executeQuery(
+                     "SELECT public.ST_X(public.ST_SetSRID(public.ST_MakePoint(1, 2), 4326)::public.geography::public.geometry)")) {
+            rs.next();
+            assertThat(rs.getDouble(1)).isEqualTo(1.0);
+        }
+    }
+
+    @Test
+    void assetsHaveRlsGistIndexPartialUniqueCodeAndNoRuntimeDelete() throws Exception {
+        assertThat(queryBoolean("SELECT relrowsecurity FROM pg_class WHERE oid = 'eam.assets'::regclass")).isTrue();
+        assertThat(queryBoolean("SELECT EXISTS (SELECT 1 FROM pg_indexes WHERE schemaname = 'eam'"
+                + " AND indexname = 'idx_assets_location' AND indexdef LIKE '%USING gist%')")).isTrue();
+        assertThat(queryBoolean("SELECT EXISTS (SELECT 1 FROM pg_indexes WHERE schemaname = 'eam'"
+                + " AND indexname = 'uq_assets_code_active' AND indexdef LIKE '%lower%'"
+                + " AND indexdef LIKE '%deleted_at IS NULL%')")).isTrue();
+        assertThat(queryBoolean("SELECT has_table_privilege('eam_runtime', 'eam.assets', 'DELETE')")).isFalse();
+        assertThat(queryBoolean("SELECT has_table_privilege('eam_runtime', 'eam.assets', 'SELECT')")).isTrue();
+        assertThat(queryBoolean("SELECT has_table_privilege('eam_login_lookup', 'eam.assets', 'SELECT')")).isFalse();
+    }
+
+    @Test
+    void assetTypeStatusAndCriticalityRejectValuesOutsideTheirSets() throws Exception {
+        UUID tenantId = UUID.randomUUID();
+        TenantSeed.seedTenant(tenantId);
+        assertRejected("assets_asset_type_check", () -> AssetSeed.seed(tenantId, "BAD-T", "WIDGET", null));
+        assertRejected("assets_status_check", () -> AssetSeed.seed(
+                new AssetSeed.Spec(tenantId, "BAD-S", "SUBSTATION", null).state("BROKEN", "LOW")));
+        assertRejected("assets_criticality_check", () -> AssetSeed.seed(
+                new AssetSeed.Spec(tenantId, "BAD-C", "SUBSTATION", null).state("IN_SERVICE", "EXTREME")));
+    }
+
+    @Test
+    void substationsAreRootsAndOtherTypesNeedAParent() throws Exception {
+        UUID tenantId = UUID.randomUUID();
+        TenantSeed.seedTenant(tenantId);
+        UUID substation = AssetSeed.seed(tenantId, "SUB-ROOT", "SUBSTATION", null);
+
+        assertRejected("assets_root_is_substation", () -> AssetSeed.seed(tenantId, "SUB-KID", "SUBSTATION", substation));
+        assertRejected("assets_root_is_substation", () -> AssetSeed.seed(tenantId, "F-ORPHAN", "FEEDER", null));
+    }
+
+    @Test
+    void parentTypeIsEnforcedByTheDatabase() throws Exception {
+        UUID tenantId = UUID.randomUUID();
+        TenantSeed.seedTenant(tenantId);
+        UUID[] chain = AssetSeed.seedChain(tenantId, "-PT");
+
+        assertRejected("must be a SUBSTATION", () -> AssetSeed.seed(tenantId, "F-UNDER-TX", "FEEDER", chain[2]));
+        assertRejected("must be a FEEDER", () -> AssetSeed.seed(tenantId, "TX-UNDER-SUB", "TRANSFORMER", chain[0]));
+        AssetSeed.seed(tenantId, "TX-OK", "TRANSFORMER", chain[1]);
+    }
+
+    @Test
+    void parentMustBelongToTheSameTenant() throws Exception {
+        UUID tenantA = UUID.randomUUID();
+        UUID tenantB = UUID.randomUUID();
+        TenantSeed.seedTenant(tenantA);
+        TenantSeed.seedTenant(tenantB);
+        UUID substationInA = AssetSeed.seed(tenantA, "SUB-A", "SUBSTATION", null);
+
+        assertThatThrownBy(() -> AssetSeed.seed(tenantB, "F-CROSS", "FEEDER", substationInA))
+                .isInstanceOf(SQLException.class);
+    }
+
+    @Test
+    void activeAssetCodeIsUniquePerTenantIgnoringCaseAndReusableAfterSoftDelete() throws Exception {
+        UUID tenantA = UUID.randomUUID();
+        UUID tenantB = UUID.randomUUID();
+        TenantSeed.seedTenant(tenantA);
+        TenantSeed.seedTenant(tenantB);
+        UUID first = AssetSeed.seed(tenantA, "DUP-1", "SUBSTATION", null);
+
+        assertRejected("uq_assets_code_active", () -> AssetSeed.seed(tenantA, "dup-1", "SUBSTATION", null));
+        AssetSeed.seed(tenantB, "DUP-1", "SUBSTATION", null);
+        AssetSeed.softDelete(first);
+        AssetSeed.seed(tenantA, "DUP-1", "SUBSTATION", null);
+    }
+
+    @Test
+    void runtimeRoleCannotHardDeleteAssetsAndSeesOnlyItsTenant() throws Exception {
+        UUID tenantA = UUID.randomUUID();
+        UUID tenantB = UUID.randomUUID();
+        TenantSeed.seedTenant(tenantA);
+        TenantSeed.seedTenant(tenantB);
+        AssetSeed.seed(tenantA, "RLS-A", "SUBSTATION", null);
+        AssetSeed.seed(tenantB, "RLS-B", "SUBSTATION", null);
+
+        try (Connection runtime = runtimeConnection(tenantA); Statement statement = runtime.createStatement()) {
+            try (ResultSet rs = statement.executeQuery("SELECT asset_code FROM eam.assets")) {
+                List<String> codes = new ArrayList<>();
+                while (rs.next()) {
+                    codes.add(rs.getString(1));
+                }
+                assertThat(codes).contains("RLS-A").doesNotContain("RLS-B");
+            }
+            assertThatThrownBy(() -> statement.executeUpdate("DELETE FROM eam.assets"))
+                    .isInstanceOf(SQLException.class)
+                    .hasMessageContaining("permission denied");
+        }
+    }
+
+    @Test
+    void parentTypeRuleAlsoHoldsOnUpdate() throws Exception {
+        UUID tenantId = UUID.randomUUID();
+        TenantSeed.seedTenant(tenantId);
+        UUID[] chain = AssetSeed.seedChain(tenantId, "-UP");
+
+        try (Connection admin = adminConnection(); Statement statement = admin.createStatement()) {
+            assertThatThrownBy(() -> statement.executeUpdate(
+                    "UPDATE eam.assets SET parent_id = '" + chain[0] + "' WHERE id = '" + chain[2] + "'"))
+                    .isInstanceOf(SQLException.class)
+                    .hasMessageContaining("must be a FEEDER");
+            assertThatThrownBy(() -> statement.executeUpdate(
+                    "UPDATE eam.assets SET asset_type = 'TRANSFORMER' WHERE id = '" + chain[1] + "'"))
+                    .isInstanceOf(SQLException.class)
+                    .hasMessageContaining("must be a FEEDER");
+        }
+    }
+
+    @Test
+    void runtimeCannotInsertAnAssetForAnotherTenant() throws Exception {
+        UUID tenantA = UUID.randomUUID();
+        UUID tenantB = UUID.randomUUID();
+        TenantSeed.seedTenant(tenantA);
+        TenantSeed.seedTenant(tenantB);
+
+        try (Connection runtime = runtimeConnection(tenantA); Statement statement = runtime.createStatement()) {
+            assertThatThrownBy(() -> statement.executeUpdate(
+                    "INSERT INTO eam.assets (id, tenant_id, asset_code, name, asset_type) VALUES ('"
+                            + UUID.randomUUID() + "', '" + tenantB + "', 'XT-1', 'Cross tenant', 'SUBSTATION')"))
+                    .isInstanceOf(SQLException.class)
+                    .hasMessageContaining("row-level security");
         }
     }
 }
