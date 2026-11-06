@@ -104,8 +104,10 @@ const ts = (iso) => Date.parse(iso);
  *  sourceChangedAt   ISO time of the latest change under the frontend source
  *  gateRows          parsed gate_log rows
  *  level             1 or 2 (see levelForStatus)
+ *  status            the story's Story_Map status. A DONE story's evidence records the UI as shipped, so a
+ *                    later frontend change does not make it stale (INF-005). All other checks still apply.
  */
-export function evaluateEvidence({ story, report, hashesOnDisk, requirements, sourceChangedAt, gateRows, level }) {
+export function evaluateEvidence({ story, report, hashesOnDisk, requirements, sourceChangedAt, gateRows, level, status }) {
   const problems = [];
   if (!report) {
     problems.push(
@@ -153,7 +155,7 @@ export function evaluateEvidence({ story, report, hashesOnDisk, requirements, so
     }
   }
 
-  if (sourceChangedAt && ts(sourceChangedAt) > ts(report.generatedAt)) {
+  if (status !== "DONE" && sourceChangedAt && ts(sourceChangedAt) > ts(report.generatedAt)) {
     problems.push(
       `Evidence is stale: frontend source changed at ${sourceChangedAt}, after capture at ${report.generatedAt}. Re-run capture.`,
     );

@@ -66,3 +66,9 @@ Owned by LIBRARIAN. Append-only decision/status log.
 - **Review:** REVIEWER ran 5 rounds in separate sessions (4 KICK_BACK, then PASS). No silent miss or false positive on any of the 44 real story files. 62 of 62 visual-check tests, `--all` green, scope-guard 14 of 14.
 - **Filed:** CHG-007 (loud over-reports and exotic markdown the line scanner does not handle), OPEN awaiting LIBRARIAN decision. Recommendation: leave as is, revisit with a real markdown parser if another patch round is needed.
 - **Record:** `docs/changes/INF-004-coverage-check-section-bounds.md`.
+
+## 2026-11-06 - INF-005 applied: DONE stories exempt from evidence staleness
+
+- **Why:** US-002's nav item staled US-001's DONE evidence, failing the CI gate. Owner chose to fix the gate. The first design (per-story Files in Scope) would not have worked because US-001's scope is `frontend/src/**`; replaced with: a DONE story is not stale-checked.
+- **Applied (pending REVIEWER and merge):** `lib.mjs`, `check-visual-evidence.mjs`, tests (67 of 67), Definition of Done. In-flight stories still stale-checked; DONE stories still need intact, complete, reviewed evidence.
+- **Record:** `docs/changes/INF-005-done-stories-exempt-from-evidence-staleness.md`.
