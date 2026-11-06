@@ -2,7 +2,7 @@
 
 **Epic:** EPIC-01 Platform Foundation
 **Actor:** Maria Alvarez, Control-Center Operator
-**Status:** LIBRARIAN_VERIFICATION (ACs approved by Mike Barnes, 2026-10-20)
+**Status:** DONE (ACs approved by Mike Barnes, 2026-10-20)
 **Scope:** FULL_STACK
 
 ## User Story
@@ -210,3 +210,35 @@ docs/project/stories/US-002-canonical-asset-record-search.md
 docs/project/Story_Map.md
 docs/project/Sprint_Log.md
 docs/project/gate_log.csv
+
+## Librarian Sign-Off: US-002 (Canonical Asset Record and Search)
+
+**Date:** 2026-11-06
+**Reviewer:** REVIEWER role, round 3 PASS and VISUAL PASS (separate sessions; rounds 1 and 2 KICK_BACK, all findings fixed in the story)
+**Librarian:** LIBRARIAN role
+**Status:** ✅ DONE
+
+## Verification Checklist
+
+- [x] Design document complete (`docs/design/US-002/asset-search-and-360.md`, Architect Design in this file)
+- [x] Code review PASSED (no hard gate failures)
+- [x] Coverage clears the 65% CI floor (backend branch coverage 93.75%, asset package 8 of 8; 80% target met). Frontend coverage is not measured: pre-existing, tracked as CHG-001, OPEN.
+- [x] All ACs implemented and tested (AC 1 to 3: AssetIT, AssetPages tests, 22 visual shots)
+- [x] Traceability links verified (story, design, migration `V20261103_0900__Create_assets.sql`, `com.eam.asset`, frontend pages, evidence, gate rows)
+- [x] No untracked gaps: every gap named in the story, design, review or evidence notes has a CHG-### id or was fixed (CHG-006 closed as Option A, CHG-001 existing, INF-005 merged, CHG-008 filed)
+- [x] No CHG-### on this story has a status of OPEN (CHG-006 CLOSED)
+
+- **Migration added:** `V20261103_0900__Create_assets.sql`.
+- **Visual evidence:** `check-visual-evidence.mjs --story US-002 --level 2`: US-002: visual evidence OK.
+- **PR:** #13 MERGED to main (merge commit 04dfac9, verified on GitHub 2026-11-06).
+
+## Test Results
+
+- Backend `./mvnw verify`: 34 unit and 64 integration tests passed, 0 failed (AssetIT 22, MigrationIT 20).
+- Frontend: 81 tests passed, lint and build clean.
+- Visual-check tests 67 of 67, scope-guard 14 of 14.
+
+---
+
+**Signed:** LIBRARIAN
+**Date:** 2026-11-06

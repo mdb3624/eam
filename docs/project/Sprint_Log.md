@@ -87,3 +87,11 @@ Owned by LIBRARIAN. Append-only decision/status log.
 - **Applied (pending REVIEWER and merge):** `lib.mjs`, `check-visual-evidence.mjs`, tests (67 of 67), Definition of Done. In-flight stories still stale-checked; DONE stories still need intact, complete, reviewed evidence.
 - **Record:** `docs/changes/INF-005-done-stories-exempt-from-evidence-staleness.md`.
 - **Review:** REVIEWER PASS (separate session), CI green on the branch. Filed CHG-008, OPEN awaiting LIBRARIAN: a Bash `sed` that flips a story to DONE bypasses the hook and now the CI stale check too. Recommendation: CI compares Story_Map at the base ref (option B).
+
+## 2026-11-06 - US-002 DONE
+
+- **Merged:** PR #13 (US-002) at 04dfac9, after PR #14 (INF-005). Both verified MERGED on GitHub. CI on #13 all green including the Visual Evidence Gate.
+- **Shipped:** assets schema and PostGIS, two read endpoints, Asset search and Asset 360, Assets nav item, 22 visual shots.
+- **Closed:** CHG-006 (Option A). **Open and unrelated to a blocker:** CHG-001 (frontend coverage unmeasured), CHG-008 (Bash DONE flip skips the CI stale check), CHG-007, CHG-003 and CHG-004 (Tier A, owner).
+- **Backlog:** multi-field asset search (BRD 8.2), new story for the BA, Gate 1.
+- **Record:** sign-off at the bottom of `docs/project/stories/US-002-canonical-asset-record-search.md`. Close-out is a follow-up PR because DONE needs a verified merge.
