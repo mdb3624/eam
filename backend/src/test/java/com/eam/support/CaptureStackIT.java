@@ -34,6 +34,9 @@ class CaptureStackIT extends AbstractPostgresIT {
 
         UUID tenantId = UUID.randomUUID();
         TenantSeed.seedTenant(tenantId);
+        try (var admin = adminConnection(); var statement = admin.createStatement()) {
+            statement.executeUpdate("UPDATE eam.tenants SET name = 'Metro Power' WHERE id = '" + tenantId + "'");
+        }
         UUID operator = TenantSeed.seedUser(tenantId, "maria@utility.test", null, "OPERATOR", true);
         UUID noRole = TenantSeed.seedUser(tenantId, "norole@utility.test", null, null, true);
 

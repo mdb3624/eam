@@ -97,7 +97,9 @@ export default function AssetPage() {
       <section className="placeholder" data-testid="asset-not-found">
         <h1>Asset not found</h1>
         <p>No matching asset.</p>
-        <Link to="/assets">Back to asset search</Link>
+        <Link to="/assets" data-testid="asset-not-found-back">
+          Back to asset search
+        </Link>
       </section>
     )
   }
@@ -114,7 +116,7 @@ export default function AssetPage() {
   const criticality = CRITICALITY[asset.criticality]
   return (
     <div className="asset-360">
-      <Link to="/assets" className="back-link">
+      <Link to="/assets" className="back-link" data-testid="asset-back-link">
         &lt; Asset search
       </Link>
       <section className="card" aria-labelledby="asset-title">
@@ -156,7 +158,11 @@ export default function AssetPage() {
                   {current || entry.assetType === 'UTILITY' ? (
                     <span className="mono">{text}</span>
                   ) : (
-                    <Link to={`/assets/${entry.id}`} className="mono">
+                    <Link
+                      to={`/assets/${entry.id}`}
+                      className="mono"
+                      data-testid={`asset-hierarchy-link-${entry.assetType.toLowerCase()}`}
+                    >
                       {text}
                     </Link>
                   )}

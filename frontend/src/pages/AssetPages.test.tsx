@@ -332,8 +332,8 @@ describe('Asset pages', () => {
       expect(items[3]).toHaveAttribute('aria-current', 'page')
       expect(within(items[3]).queryByRole('link')).not.toBeInTheDocument()
       expect(within(items[0]).queryByRole('link')).not.toBeInTheDocument()
-      expect(within(items[1]).getByRole('link')).toHaveAttribute('href', `/assets/${SUB_ID}`)
-      expect(within(items[2]).getByRole('link')).toHaveAttribute('href', `/assets/${FEEDER_ID}`)
+      expect(screen.getByTestId('asset-hierarchy-link-substation')).toHaveAttribute('href', `/assets/${SUB_ID}`)
+      expect(screen.getByTestId('asset-hierarchy-link-feeder')).toHaveAttribute('href', `/assets/${FEEDER_ID}`)
     })
 
     it('state:location-not-recorded and missing details show "Not recorded", never blank', async () => {
@@ -349,7 +349,7 @@ describe('Asset pages', () => {
       renderAsset()
       const user = userEvent.setup()
 
-      await user.click(await screen.findByRole('link', { name: /Asset search/ }))
+      await user.click(await screen.findByTestId('asset-back-link'))
 
       expect(await screen.findByTestId('asset-search-input')).toBeInTheDocument()
     })
@@ -362,7 +362,7 @@ describe('Asset pages', () => {
       const card = await screen.findByTestId('asset-not-found')
       expect(card).toHaveTextContent('Asset not found')
       expect(card).toHaveTextContent('No matching asset.')
-      expect(within(card).getByRole('link', { name: 'Back to asset search' })).toHaveAttribute('href', '/assets')
+      expect(within(card).getByTestId('asset-not-found-back')).toHaveAttribute('href', '/assets')
     })
 
     it('a malformed id (400) is shown as not found too', async () => {
@@ -413,7 +413,7 @@ describe('Asset pages', () => {
       })
       const user = userEvent.setup()
 
-      await user.click(await screen.findByRole('link', { name: /SUB-3/ }))
+      await user.click(await screen.findByTestId('asset-hierarchy-link-substation'))
 
       expect(await screen.findByRole('heading', { level: 1, name: 'SUB-3' })).toBeInTheDocument()
     })
