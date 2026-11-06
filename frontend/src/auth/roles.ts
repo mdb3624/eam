@@ -5,7 +5,7 @@ export type Role =
   | 'MAINTENANCE_SUPERVISOR'
   | 'SYSTEM_ADMIN'
 
-export type IconName = 'alarm' | 'dispatch' | 'work' | 'closure' | 'admin'
+export type IconName = 'alarm' | 'dispatch' | 'work' | 'closure' | 'admin' | 'search'
 
 export interface RoleConfig {
   label: string
@@ -26,6 +26,13 @@ export const ROLE_CONFIG: Record<Role, RoleConfig> = {
     icon: 'closure',
   },
   SYSTEM_ADMIN: { label: 'System Administrator', navLabel: 'Administration', home: '/admin', icon: 'admin' },
+}
+
+/** Second nav item for every role with access, after the home item (docs/design/US-002/asset-search-and-360.md). */
+export const ASSETS_NAV: { label: string; route: string; icon: IconName } = {
+  label: 'Assets',
+  route: '/assets',
+  icon: 'search',
 }
 
 export const ROLES = Object.keys(ROLE_CONFIG) as Role[]

@@ -31,6 +31,12 @@ export function RequireRole({ role, children }: { role: Role; children: JSX.Elem
   return user?.role === role ? children : <AccessDenied />
 }
 
+/** Gate for screens open to every role: only a user with no role assigned is denied. */
+export function RequireAnyRole({ children }: { children: JSX.Element }) {
+  const { user } = useAuth()
+  return user?.role ? children : <AccessDenied />
+}
+
 export function Loading() {
   return (
     <div role="status" className="loading">

@@ -15,6 +15,12 @@ const PATHS: Record<IconName, JSX.Element> = {
   ),
   work: <path d="M14.7 6.3a4 4 0 00-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 005.4-5.4l-2.4 2.4-2.6-.6-.6-2.6z" />,
   closure: <path d="M5 12l5 5L20 7" />,
+  search: (
+    <>
+      <circle cx="11" cy="11" r="7" />
+      <path d="M16.5 16.5L21 21" />
+    </>
+  ),
   admin: (
     <>
       <circle cx="12" cy="8" r="4" />

@@ -2,7 +2,7 @@
 
 **Epic:** EPIC-01 Platform Foundation
 **Actor:** Maria Alvarez, Control-Center Operator
-**Status:** READY_FOR_DESIGN (ACs approved by Mike Barnes, 2026-10-20)
+**Status:** CODE_REVIEW (ACs approved by Mike Barnes, 2026-10-20)
 **Scope:** FULL_STACK
 
 ## User Story

@@ -3,7 +3,7 @@
 eam is a multi-tenant utility asset and field operations platform. This document covers the development-environment baseline only; domain design is owned by ARCHITECT per story.
 
 ## Stack
-Java 21, Spring Boot 3.5, Maven wrapper, PostgreSQL 16 (PostGIS image, extension not yet enabled), Flyway, React 18 + TypeScript + Vite.
+Java 21, Spring Boot 3.5, Maven wrapper, PostgreSQL 16 with PostGIS (extension enabled in schema `public` by the US-002 migration; the connection `search_path` is `eam` only, so qualify PostGIS names as `public.ST_X`, `public.geography`), Flyway, React 18 + TypeScript + Vite.
 
 ## Multi-tenancy
 - Tenant identity lives in `TenantContextHolder` (ThreadLocal) and must be cleared in a `finally` block.
