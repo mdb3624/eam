@@ -89,7 +89,7 @@ export function newlyDoneStories(mapText, baseMapText) {
 }
 
 /** Story_Map.md as of a git ref, or "" when it cannot be read (a ref that predates the map counts as empty). */
-function mapAtRef(root, ref) {
+export function mapAtRef(root, ref) {
   try {
     return execFileSync("git", ["show", `${ref}:docs/project/Story_Map.md`], { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
   } catch {

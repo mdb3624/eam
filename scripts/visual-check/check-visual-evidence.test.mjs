@@ -5,7 +5,8 @@ import { createHash } from "node:crypto";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { checkStory, checkAll, newlyDoneStories } from "./check-visual-evidence.mjs";
+import { execFileSync } from "node:child_process";
+import { checkStory, checkAll, mapAtRef, newlyDoneStories } from "./check-visual-evidence.mjs";
 
 const png = Buffer.alloc(5000, 7);
 const sha = createHash("sha256").update(png).digest("hex");
@@ -146,4 +147,15 @@ test("checkAll stale-checks a story that became DONE in this change but not one 
   const flipped = checkAll({ root, sourceChangedAt, newlyDone: new Set(["US-001"]) });
   assert.ok(flipped[0].problems.some((p) => /stale/i.test(p)));
   assert.deepEqual(checkAll({ root, sourceChangedAt, newlyDone: new Set() }), []);
+});
+
+test("mapAtRef reads Story_Map at a git ref and returns empty for an unreadable ref", () => {
+  const root = repo({ status: "CODE_REVIEW" });
+  const git = (...args) => execFileSync("git", ["-c", "user.name=t", "-c", "user.email=t@t", ...args], { cwd: root, stdio: "ignore" });
+  git("init", "-q");
+  git("add", "-A");
+  git("commit", "-q", "-m", "base");
+  writeFileSync(join(root, "docs/project/Story_Map.md"), "changed\n");
+  assert.match(mapAtRef(root, "HEAD"), /US-001 \| Login .* CODE_REVIEW/);
+  assert.equal(mapAtRef(root, "no-such-ref"), "");
 });

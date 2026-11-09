@@ -18,7 +18,7 @@ INF-005 exempts a DONE story from the evidence staleness check. A Bash edit (`se
 
 ## Verification
 
-- `node --test scripts/visual-check/*.test.mjs`: 69 of 69 pass (2 added: `newlyDoneStories` diffing, and `checkAll` stale-checking a newly DONE story but not an already DONE one).
+- `node --test scripts/visual-check/*.test.mjs`: 70 of 70 pass (3 added: `newlyDoneStories` diffing, and `checkAll` stale-checking a newly DONE story but not an already DONE one, and `mapAtRef` against a temp git repo).
 - `--all --base HEAD~3` and `--all --base HEAD` both green on the current tree.
 
 ## Files in Scope

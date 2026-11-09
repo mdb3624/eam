@@ -99,5 +99,5 @@ Owned by LIBRARIAN. Append-only decision/status log.
 ## 2026-11-09 - INF-006 applied: CI stale-checks stories that become DONE in the PR
 
 - **Why:** CHG-008. After INF-005 a Bash flip to DONE with stale evidence passed CI. Option B (LIBRARIAN recommendation) taken when the owner said "go".
-- **Applied (pending REVIEWER and merge):** `check-visual-evidence.mjs --all --base <ref>`, `ci.yml` passes the PR base sha, tests 69 of 69.
+- **Applied (pending REVIEWER and merge):** `check-visual-evidence.mjs --all --base <ref>`, `ci.yml` passes the PR base sha, tests 70 of 70, REVIEWER PASS.
 - **Closed:** CHG-008. **Record:** `docs/changes/INF-006-ci-stale-checks-stories-flipped-to-done.md`.
