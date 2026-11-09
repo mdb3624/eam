@@ -95,3 +95,9 @@ Owned by LIBRARIAN. Append-only decision/status log.
 - **Closed:** CHG-006 (Option A). **Open and unrelated to a blocker:** CHG-001 (frontend coverage unmeasured), CHG-008 (Bash DONE flip skips the CI stale check), CHG-007, CHG-003 and CHG-004 (Tier A, owner).
 - **Backlog:** multi-field asset search (BRD 8.2), new story for the BA, Gate 1.
 - **Record:** sign-off at the bottom of `docs/project/stories/US-002-canonical-asset-record-search.md`. Close-out is a follow-up PR because DONE needs a verified merge.
+
+## 2026-11-09 - INF-006 applied: CI stale-checks stories that become DONE in the PR
+
+- **Why:** CHG-008. After INF-005 a Bash flip to DONE with stale evidence passed CI. Option B (LIBRARIAN recommendation) taken when the owner said "go".
+- **Applied (pending REVIEWER and merge):** `check-visual-evidence.mjs --all --base <ref>`, `ci.yml` passes the PR base sha, tests 69 of 69.
+- **Closed:** CHG-008. **Record:** `docs/changes/INF-006-ci-stale-checks-stories-flipped-to-done.md`.

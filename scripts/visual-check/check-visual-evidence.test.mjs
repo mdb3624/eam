@@ -5,7 +5,7 @@ import { createHash } from "node:crypto";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { checkStory, checkAll } from "./check-visual-evidence.mjs";
+import { checkStory, checkAll, newlyDoneStories } from "./check-visual-evidence.mjs";
 
 const png = Buffer.alloc(5000, 7);
 const sha = createHash("sha256").update(png).digest("hex");
@@ -128,4 +128,22 @@ test("checkStory reads the status from the Story_Map when called with --story se
   const done = repo({ status: "DONE", gateRows: `2026-10-20T13:00:00Z,US-001,VISUAL,REVIEWER,PASS,,all shots reviewed,
 ` });
   assert.deepEqual(checkStory({ root: done, story: "US-001", level: 1, sourceChangedAt: "2026-10-21T00:00:00Z" }).problems, []);
+});
+
+// INF-006 (CHG-008)
+test("newlyDoneStories lists stories that became DONE since the base map", () => {
+  const row = (id, status) => `| ${id} | T | EPIC-01 | M | FULL_STACK | ${status} |`;
+  const base = [row("US-001", "DONE"), row("US-002", "CODE_REVIEW"), row("US-003", "READY_FOR_DESIGN")].join("\n");
+  const head = [row("US-001", "DONE"), row("US-002", "DONE"), row("US-003", "READY_FOR_DESIGN"), row("US-004", "DONE")].join("\n");
+  assert.deepEqual([...newlyDoneStories(head, base)].sort(), ["US-002", "US-004"]);
+  assert.deepEqual([...newlyDoneStories(head, "")].sort(), ["US-001", "US-002", "US-004"]);
+});
+
+test("checkAll stale-checks a story that became DONE in this change but not one already DONE", () => {
+  const signed = "2026-10-20T13:00:00Z,US-001,VISUAL,REVIEWER,PASS,,all shots reviewed,\n";
+  const root = repo({ status: "DONE", gateRows: signed });
+  const sourceChangedAt = "2026-10-21T00:00:00Z";
+  const flipped = checkAll({ root, sourceChangedAt, newlyDone: new Set(["US-001"]) });
+  assert.ok(flipped[0].problems.some((p) => /stale/i.test(p)));
+  assert.deepEqual(checkAll({ root, sourceChangedAt, newlyDone: new Set() }), []);
 });

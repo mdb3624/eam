@@ -15,5 +15,5 @@
 1. LIBRARIAN decides.
 2. If B, file an INF for the CI base-ref comparison and its tests.
 
-**Status:** CHG-008 OPEN (awaiting decision)
+**Status:** CHG-008 CLOSED 2026-11-09. Option B, implemented as INF-006 (`docs/changes/INF-006-ci-stale-checks-stories-flipped-to-done.md`).
 **Assign to:** LIBRARIAN
