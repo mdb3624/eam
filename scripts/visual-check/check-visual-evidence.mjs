@@ -1,7 +1,8 @@
 // Visual evidence gate: verify a story's screenshots. See docs/standards/Definition_of_Done.md.
 //
 //   node scripts/visual-check/check-visual-evidence.mjs --story US-001 [--level 1|2]
-//   node scripts/visual-check/check-visual-evidence.mjs --all        (CI: every gated UI story in Story_Map)
+//   node scripts/visual-check/check-visual-evidence.mjs --all [--base <ref>]   (CI: every gated UI story in Story_Map;
+//       with --base, a story that became DONE since <ref> is still stale-checked, see CHG-008)
 //
 // Exit 1 and print what is wrong when evidence is missing, wrong, stale or unreviewed.
 import { execFileSync } from "node:child_process";
@@ -73,15 +74,42 @@ export function checkStory({ root, story, level, sourceChangedAt, status = mapSt
 
 const MAP_ROW = /^\|\s*(US-\d+)\s*\|.*\|\s*([A-Z_]+)\s*\|\s*([A-Z_]+)\s*\|\s*$/;
 
-/** Every UI story in the Story_Map that has reached a gated status, with its problems (if any). */
-export function checkAll({ root, sourceChangedAt }) {
+/** Stories whose Story_Map status is DONE in `mapText` and was something else (or absent) in `baseMapText`. */
+export function newlyDoneStories(mapText, baseMapText) {
+  const statuses = (text) => {
+    const out = new Map();
+    for (const line of (text ?? "").split(/\r?\n/)) {
+      const m = MAP_ROW.exec(line);
+      if (m) out.set(m[1], m[3]);
+    }
+    return out;
+  };
+  const before = statuses(baseMapText);
+  return new Set([...statuses(mapText)].filter(([id, s]) => s === "DONE" && before.get(id) !== "DONE").map(([id]) => id));
+}
+
+/** Story_Map.md as of a git ref, or "" when it cannot be read (a ref that predates the map counts as empty). */
+export function mapAtRef(root, ref) {
+  try {
+    return execFileSync("git", ["show", `${ref}:docs/project/Story_Map.md`], { cwd: root, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
+  } catch {
+    return "";
+  }
+}
+
+/**
+ * Every UI story in the Story_Map that has reached a gated status, with its problems (if any).
+ * A story in `newlyDone` is DONE only as of this change, so it is not yet exempt from the staleness check.
+ */
+export function checkAll({ root, sourceChangedAt, newlyDone = new Set() }) {
   const mapPath = join(root, "docs/project/Story_Map.md");
   if (!existsSync(mapPath)) return [];
   const failures = [];
   for (const line of readFileSync(mapPath, "utf8").split(/\r?\n/)) {
     const m = MAP_ROW.exec(line);
     if (!m || !isUiScope(m[2]) || levelForStatus(m[3]) === 0) continue;
-    const { problems } = checkStory({ root, story: m[1], level: levelForStatus(m[3]), sourceChangedAt, status: m[3] });
+    const status = newlyDone.has(m[1]) ? null : m[3];
+    const { problems } = checkStory({ root, story: m[1], level: levelForStatus(m[3]), sourceChangedAt, status });
     if (problems.length > 0) failures.push({ story: m[1], status: m[3], problems });
   }
   return failures;
@@ -96,7 +124,10 @@ function main(argv) {
   const sourceChangedAt = latestSourceChange(root);
 
   if (argv.includes("--all")) {
-    const failures = checkAll({ root, sourceChangedAt });
+    const base = arg("--base");
+    const mapPath = join(root, "docs/project/Story_Map.md");
+    const newlyDone = base && existsSync(mapPath) ? newlyDoneStories(readFileSync(mapPath, "utf8"), mapAtRef(root, base)) : new Set();
+    const failures = checkAll({ root, sourceChangedAt, newlyDone });
     for (const f of failures) {
       console.error(`${f.story} (${f.status}) is missing visual evidence:`);
       for (const p of f.problems) console.error(`  - ${p}`);
